@@ -17,3 +17,10 @@
 
 
 #### 6. `DNS Server` : Domain Name System server.  Its primary purpose is to translate human-readable domain names (such as www.example.com) into machine-readable IP addresses (such as 192.0.2.1). This process is known as DNS resolution or DNS name resolution.
+
+
+
+#### 7. `<ping>` : to discover wether a particular IP address is online or not and to measure the round-trip time it takes for a data packet to travel from the source to the destination and  back again. 
+
+- usage : `ping youtube.com`, `ping youtube.com -s packet_size`, `ping youtube.com -t ttl_value`
+
