@@ -1,0 +1,9 @@
+1. c
+that depends on the server where i am sending the 
+ping request 
+`iitd.ac.in` 8184 + 8
+`youtube.com` 68 +  8 
+// apply binary search using scripting language
+
+
+1. b

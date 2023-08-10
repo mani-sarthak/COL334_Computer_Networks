@@ -1,0 +1,164 @@
+\documentclass[11pt]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,wrapfig,float,amsmath,multicol}
+\usepackage[section]{placeins}
+\usepackage{pgf,tikz,pgfplots}
+\usepackage{pgfplots}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=blue
+}
+\usetikzlibrary{calc}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.15}
+\usepackage{mathrsfs}
+\usetikzlibrary{arrows}
+\usepackage[english]{babel}
+\usepackage{a}
+\usepackage{graphicx}
+\usepackage[sexy]{evan}
+\usepackage[dvipsnames]{xcolor}
+\author{ by Mani Sarthak \& Harshit Gupta}
+\date{\today}
+\setlength{\parindent}{0pt}
+\usepackage{caption}
+\usepackage{amssymb}
+\captionsetup[table]{labelsep=space}
+\setcounter{tocdepth}{5}
+\graphicspath{ {./images/} }
+
+
+%COL 216 here
+\title{Computer Networks}
+
+
+\begin{document}
+
+\maketitle
+
+Some points to be considered:
+\begin{itemize}
+    \item Changing associativity and increasing cache size do affect the latency of the cache but here we are not considering such effects. As expected this will result in slightly different results as compared to the actual scenario.
+    \item All the plots are generated from the Python matplotlib library, the code for which is provided \href{https://drive.google.com/drive/folders/1ggkQp2t3NUP2j-lU_Dst7DpPSrZ3AbAS?usp=sharing}{\textcolor{blue}{here}} (in the file named run.py see createPlot).
+    \item The summary containing the data of time taken (in ns) is \href{https://drive.google.com/file/d/1tbcX3iz1-sOLc5bymLP_e-yGbUJjtBvu/view?usp=sharing}{\textcolor{blue}{here}}.
+    \item The plots used in the report can be seen \href{https://drive.google.com/drive/folders/170nIbyIFCMwzpfevd__3WixwtmWZnnlW?usp=share_link}{\textcolor{blue}{here}}.
+
+    
+    
+\end{itemize}
+
+\vfill
+\begin{center}
+   Token Distribution:
+\\
+1. Mani Sarthak : 2021CS10095 : 10
+\\
+2. Devang Garg \ : 2021CS10569 : 10 
+\end{center}
+
+
+
+
+\newpage
+\section{ Read case :}
+\subsection{ Read Hit in L1 :} 
+In this case only the LRU needs to be updated.
+\subsection{ Read Miss in L1, hit in L2 :}
+In this case the LRU is updated, value is taken from L2 and stored in L1, if something is evicted from L1, then it is written back using WBWA policy if it is dirty.
+\subsection{ Double Miss :}
+In this case the value is loaded from memory to both L2 and L1 and LRU is updaated.
+\section{ Write case :}
+\subsection{ Write hit in L1 :}
+In this case the dirty bit for value is changed and LRU is updated.
+\subsection{ Write miss in L1, hit in L2 :}
+In this case the value is loaded from L2 to L1 and dirty bit set to 1, if something is evicted from L1, then it is written back using WBWA policy if it is dirty .
+\subsection{ Double Miss :}
+In this case the LRU is updated, value is taken from memory to both L2 and L1 and LRU is updaated and dirty bit set to 1.
+\section{ A: Changing Block Size }
+\subsection{Plots}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small1.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small2.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_medium.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_large.png}
+
+\newpage
+\subsection{Observations}
+\begin{itemize}
+    \item We see that the line graphs follow a boat like shape where the performance increases to a maximum and then decreases. In increasing block size two main factors come into play which are cache collisions and spatial locality. 
+    \item While increasing the block size the effect of spatial locality is enhanced but at the same time the number of cache sets are reduced as the cache size is fixed.
+    \item Lesser number of cache sets means that block will be competing for same cache sets more frequently and hence becomes less efficient in reducing the cache misses.
+    \item In trace files that correspond to processes which largely depend on sequential access we should expect that the performance will increase with the increase in cache size, but otherwise they should follow the general trend.
+    
+\end{itemize}
+\newpage
+ \section{B: Changing L1 Cache Size}
+\subsection{ Plots}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_small.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_medium.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_large.png}
+
+\subsection{Observations}
+\begin{itemize}
+    \item Increasing the cache size and keeping the rest of the factors same results in more number of cache sets. Also because here we are not considering the fact that increasing cache size results in increase in latency, there is no negative effect of increasing the cache size. So we see improvement in performance with increase in cache size.
+    \item Also we observe that the benefit of increasing the cache size is far more in initial stages when the cache size is small rather than when the cache size is large. At some point the cache becomes large enough that the program's working set can be fully accommodated in the cache. Hence the slow increase in performance with increase in size. Hence the graphs saturates to a final value.
+\end{itemize}
+
+\newpage
+\section{C: Changing L1 Cache Associativity}
+\subsection{Plots}
+
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_small.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_medium.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_large.png}
+
+
+\subsection{Observations}
+\begin{itemize}
+    \item We see that increasing the associativity increases the performance. However as the associativity increases beyond a certain point very less increase in performance is observed. This is because the lines in the sets are utilised to their full extent once a certain number of associativity is achieved.
+    \item We observe that increasing the associativity from 1 to 2 improves the performance for sure this is because when the associativity is 1 the cache is direct mapped and has a lot of conflict misses. This difference is quiet striking in some cases like trace 5 and 8.
+    \item Also, in trace 7 the performance decreases past associativity of 4. This is caused because of the trace file and also because the associativity change alters the access order and thus again reaching to an optimum and then decreasing performance again.
+\end{itemize}
+
+\newpage
+
+\section{D: Changing L2 Cache Size}
+\subsection{Plots}
+
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_small.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_medium.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_large.png}
+
+
+\subsection{Observations}
+\begin{itemize}
+    \item We observe that increasing L2 cache size and keeping rest of parameters the same will result in more cache sets, and hence reduction in conflict misses and capacity misses. However as the cache size is already enough (compare with L1 cache size) we see saturation in the performance most of the time.
+    \item Here also we see that improvement of increasing cache size is more in the initial stages as in increasing L1 cache size.
+\end{itemize}
+
+\newpage
+
+
+\section{E: Changing L2 Cache Associativity}
+\subsection{Plots}
+
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_small.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_medium.png}
+\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_large.png}
+
+
+\subsection{Observations}
+\begin{itemize}
+    \item We see that increasing associativity in L2 cache has less significance compared to increasing the size of L2 cache or increasing associativity in L1 cache. This is because L2 is farther away from the processor than L1 cache, and is accessed less frequently.
+    \item L2 cache is way larger than L1 cache, so it has already a lower miss rate. Increasing associativity in L2 cache would only provide a marginal improvement in reducing the conflict misses. 
+    \item Also, in traces 2 and 7 the performance decreases past associativity of 2. This may be caused because of the trace file and also because the associativity change alters the access order and thus again reaching to an optimum and then decreasing performance again.
+\end{itemize}
+
+
+\end{document}
