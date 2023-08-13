@@ -6,8 +6,9 @@
 \usepackage{pgfplots}
 \usepackage{hyperref}
 \hypersetup{
-    colorlinks=true,
-    urlcolor=blue
+    colorlinks=true,    % Colored links
+    urlcolor=blue,       % Color of URLs
+    linkcolor = blue
 }
 \usetikzlibrary{calc}
 \usepgfplotslibrary{groupplots}
@@ -31,6 +32,8 @@
 
 %COL 216 here
 \title{Computer Networks}
+\subtitle{Assignment1}
+
 
 
 \begin{document}
@@ -39,10 +42,13 @@
 
 Some points to be considered:
 \begin{itemize}
-    \item Changing associativity and increasing cache size do affect the latency of the cache but here we are not considering such effects. As expected this will result in slightly different results as compared to the actual scenario.
-    \item All the plots are generated from the Python matplotlib library, the code for which is provided \href{https://drive.google.com/drive/folders/1ggkQp2t3NUP2j-lU_Dst7DpPSrZ3AbAS?usp=sharing}{\textcolor{blue}{here}} (in the file named run.py see createPlot).
-    \item The summary containing the data of time taken (in ns) is \href{https://drive.google.com/file/d/1tbcX3iz1-sOLc5bymLP_e-yGbUJjtBvu/view?usp=sharing}{\textcolor{blue}{here}}.
-    \item The plots used in the report can be seen \href{https://drive.google.com/drive/folders/170nIbyIFCMwzpfevd__3WixwtmWZnnlW?usp=share_link}{\textcolor{blue}{here}}.
+    % \item Changing associativity and increasing cache size do affect the latency of the cache but here we are not considering such effects. As expected this will result in slightly different results as compared to the actual scenario.
+    % \item All the plots are generated from the Python matplotlib library, the code for which is provided \href{https://drive.google.com/drive/folders/1ggkQp2t3NUP2j-lU_Dst7DpPSrZ3AbAS?usp=sharing}{\textcolor{blue}{here}} (in the file named run.py see createPlot).
+    % \item The summary containing the data of time taken (in ns) is \href{https://drive.google.com/file/d/1tbcX3iz1-sOLc5bymLP_e-yGbUJjtBvu/view?usp=sharing}{\textcolor{blue}{here}}.
+    % \item The plots used in the report can be seen \href{https://drive.google.com/drive/folders/170nIbyIFCMwzpfevd__3WixwtmWZnnlW?usp=share_link}{\textcolor{blue}{here}}.
+    \item Parts 1 and 3 are done by Mani and parts 2 and 4 are done by Harshit.
+    \item All the codes are managed on GitHub and can also be found in this \href{https://drive.google.com/drive/folders/1QKKCJGQ5x3ZLXGFgR8Z5mXXcyV3pBJWg?usp=sharing}{\underline{folder}}. 
+    
 
     
     
@@ -54,111 +60,351 @@ Some points to be considered:
 \\
 1. Mani Sarthak : 2021CS10095 : 10
 \\
-2. Devang Garg \ : 2021CS10569 : 10 
+2. Harshit Gupta \ : 2021CS10552 : 10 
 \end{center}
 
 
 
 
 \newpage
-\section{ Read case :}
-\subsection{ Read Hit in L1 :} 
-In this case only the LRU needs to be updated.
-\subsection{ Read Miss in L1, hit in L2 :}
-In this case the LRU is updated, value is taken from L2 and stored in L1, if something is evicted from L1, then it is written back using WBWA policy if it is dirty.
-\subsection{ Double Miss :}
-In this case the value is loaded from memory to both L2 and L1 and LRU is updaated.
-\section{ Write case :}
-\subsection{ Write hit in L1 :}
-In this case the dirty bit for value is changed and LRU is updated.
-\subsection{ Write miss in L1, hit in L2 :}
-In this case the value is loaded from L2 to L1 and dirty bit set to 1, if something is evicted from L1, then it is written back using WBWA policy if it is dirty .
-\subsection{ Double Miss :}
-In this case the LRU is updated, value is taken from memory to both L2 and L1 and LRU is updaated and dirty bit set to 1.
-\section{ A: Changing Block Size }
-\subsection{Plots}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small1.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_small2.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_medium.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot1_large.png}
-
-\newpage
+\section{ Part1 : Network Analysis}
+\subsection{Traceroute to servers}
+Procedure: Connected personal laptop (Mani's Macbook) to 4G/5G cellular network of Jio using cellular hotspot. Then traceroute to different servers were called.
+\subsubsection{Tracerouting to \underline{www.iitd.ac.in}}
+\includegraphics[width = 15 cm, height = 18 cm]{images/iitd.ac.in.png}
+It seems as the ISP is blocking packets to the path to \underline{www.iitd.ac.in}, so we now try to traceroute to \underline{www.google.com}.
+\subsubsection{Tracerouting to \underline{www.google.com}}
+\includegraphics[width=15 cm, height = 8 cm]{images/google.com.png}
+The traceroute to \underline{www.google.com} was successful and it took 9 hops to reach the destination address.
 \subsection{Observations}
 \begin{itemize}
-    \item We see that the line graphs follow a boat like shape where the performance increases to a maximum and then decreases. In increasing block size two main factors come into play which are cache collisions and spatial locality. 
-    \item While increasing the block size the effect of spatial locality is enhanced but at the same time the number of cache sets are reduced as the cache size is fixed.
-    \item Lesser number of cache sets means that block will be competing for same cache sets more frequently and hence becomes less efficient in reducing the cache misses.
-    \item In trace files that correspond to processes which largely depend on sequential access we should expect that the performance will increase with the increase in cache size, but otherwise they should follow the general trend.
-    
+    \item After calling traceroute to multiple destinations, i didn't find any case in which paths default to IPv6, so i conclude that if that occurs then it must be rare.
+    \item By default in Mac's unix running traceroute returns IP addresses in paths in IPv4 only, however if one wants to get the IP's in IPv6 then one should use the command traceroute6.
+    \item We can also observe private IP addresses in the paths like 
+    \underline{192.168.249.240}, \underline{192.168.31.1}, \underline{198.162.13.38} and  so on and these are common in the path of both. This shows that they both use the initial routers of Jio Network which is private before transferring the packets to the global networks.
+    \item There are also routers that do not reply to traceroute requests. Example: see router number 7 in google.com traceroute call.
 \end{itemize}
-\newpage
- \section{B: Changing L1 Cache Size}
-\subsection{ Plots}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_small.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_medium.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot2_large.png}
 
-\subsection{Observations}
+\subsection{Ping}
 \begin{itemize}
-    \item Increasing the cache size and keeping the rest of the factors same results in more number of cache sets. Also because here we are not considering the fact that increasing cache size results in increase in latency, there is no negative effect of increasing the cache size. So we see improvement in performance with increase in cache size.
-    \item Also we observe that the benefit of increasing the cache size is far more in initial stages when the cache size is small rather than when the cache size is large. At some point the cache becomes large enough that the program's working set can be fully accommodated in the cache. Hence the slow increase in performance with increase in size. Hence the graphs saturates to a final value.
+    \item Ping command is used to send packets to check wether an IP address is live or not.
+    \item The -s flag allows us to send ping requests with different packet sizes with the default value being 56 Bytes (excluding 8 Bytes ICMP header). The real packet which is sent and received is 8 Bytes more than the data pinged, this is because of the 8 Byte ICMP header which is added to the original data.
+    \item The maximum size of ping packets that we are able to send from MacBook M1 by using IITD WiFi for websites is mentioned below. We have used \underline{Binary Search} to get to the conclusion.
 \end{itemize}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c||c|}
+\hline
+ Destination & Size  \\
+ \hline
+\hline
+www.facebook.com & 1472 \\
+\hline
+www.nytimes.com & 1472\\
+\hline
+www.indianexpress.com &  8184\\
+\hline
+www.iitd.ac.in & 8184 \\
+\hline
+\end{tabular}
+\caption{Table showing the maximum size of ping packets without ICMP header (in Bytes) that can be sent to the destination servers.}
+\label{tab:simple}
+\end{table}
 
-\newpage
-\section{C: Changing L1 Cache Associativity}
-\subsection{Plots}
-
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_small.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_medium.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot3_large.png}
-
-
-\subsection{Observations}
-\begin{itemize}
-    \item We see that increasing the associativity increases the performance. However as the associativity increases beyond a certain point very less increase in performance is observed. This is because the lines in the sets are utilised to their full extent once a certain number of associativity is achieved.
-    \item We observe that increasing the associativity from 1 to 2 improves the performance for sure this is because when the associativity is 1 the cache is direct mapped and has a lot of conflict misses. This difference is quiet striking in some cases like trace 5 and 8.
-    \item Also, in trace 7 the performance decreases past associativity of 4. This is caused because of the trace file and also because the associativity change alters the access order and thus again reaching to an optimum and then decreasing performance again.
-\end{itemize}
 
 \newpage
-
-\section{D: Changing L2 Cache Size}
-\subsection{Plots}
-
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_small.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_medium.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot4_large.png}
-
-
-\subsection{Observations}
+Observations:
 \begin{itemize}
-    \item We observe that increasing L2 cache size and keeping rest of parameters the same will result in more cache sets, and hence reduction in conflict misses and capacity misses. However as the cache size is already enough (compare with L1 cache size) we see saturation in the performance most of the time.
-    \item Here also we see that improvement of increasing cache size is more in the initial stages as in increasing L1 cache size.
+    \item  As servers like www.iitd.ac.in and www.indianexpress.com have very higher sizes. Also because www.facebook.com have multiple servers and the one we are sending ping is also in proximity to us but still we are getting lesser size, can be because packet size for ping also depends on servers. 
+    \item So we conclude that the maximum size depends on the servers that we are sending and also that whether they are in our proximity or not.
 \end{itemize}
+
+
+
+\newpage
+\section{ Part2}
+\subsection{Methodology}
+\textbf{Logic} : what we did here was very simple. we used linux ping command here. we observed that when we limit the TTL ( max no. of hopes) such that it can't reach the destination IP, the router sends a ICMP response upon dropping the packet which contain the IP address at which packet is dropped. so by using this observation , we iterate and increased the TTL at each iteration so that we get all intermediate IP address as no. of hops is increased by 1 each time until the packet is reached to the destination and we stop there. after that we ping at each intermediate IP to get \textbf{Round Tip Time} and we report it. so traceroute functionality is replictaed.
+
+\subsection{View of code}
+\includegraphics[width = 17 cm , height = 15 cm]{Screenshot 2023-08-12 at 4.45.44 PM.png}
+\subsection{Commands and Modules used}
+\begin{itemize}
+    \item ping -c 1 -m \textit{TTL} \textit{Destination\_IP} here -c is for sending only 1 packet and -m is for defining TTL ( here macos terminal is used)
+    \item ping -c 1 \textit{destination\_ip} for getting the time for each intermediate IP 
+    \item \textbf{subprocess} module is used for running commands at console
+    \item \textbf{re} module is used for extracting IP from text output
+    \item \textbf{sys} module for taking input from command line 
+    \item \textbf{socket} module for getting ip address for destination website
+\end{itemize}
+\subsection{Input}
+use the code and put input in console as:-\\ \\
+python/python3 script\_trace.py \textit{destination\_ip}
+\subsection{Output for \underline{www.iitd.ac.in}}
+\includegraphics[width = 17 cm, height = 4 cm]{Screenshot 2023-08-13 at 4.32.25 PM.png}
+
+\subsection{design decisions}
+\begin{itemize}
+    \item If in a particular IP we can't get a response or we can't get a intermediate IP during hops we leave a it blank with a \textbf{*} mark
+    \item  we are sending 3 packet here so Round Trip Time here is for 3 packets only and we can't change no. of packets as it is by default 3 in tarceroute as sending more than 1 packet will make many edge cases
+\end{itemize}
+
+\newpage
+\section{ Part3 }
+\subsection{Hops analysis}
+
+For India IITD WiFi is used, for South Africa the traceroute server of Capetown city was used and for USA traceroute server of Seattle was used.
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Source \& Destination & utah.edu & uct.ac.za & iitd.ac.in & google.com & facebook.com \\
+\hline
+India & 64+ & 64+ & 4 & 11 & 13 \\
+\hline
+South Africa & 19 & 4 &  20 & 13 & 19\\
+\hline
+USA &  11 & 15 & 16 & 10 & 9\\
+\hline
+\end{tabular}
+\caption{Table showing the number of hops to the destination from different traceroute servers.}
+\label{tab:simple}
+\end{table}
+
+Observations:
+\begin{itemize}
+    \item If the traceroute source and destination are close to each other geographically then they have roughly fewer hops between them. For example see (India, iitd.ac.in) , (South Africa, uct.ac.za), (USA, utah.ac.in).
+    \item Google and Facebook have very  few number of hops as compared to others. This is because they have distributed servers across the globe and the traceroute takes their closest server as destination.
+\end{itemize}
+
+\subsection{Latency Analysis}
+For India IITD WiFi is used, for South Africa the traceroute server of Capetown city was used and for USA traceroute server of Seattle was used.
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Source \& Destination & utah.edu & uct.ac.za & iitd.ac.in & google.com & facebook.com \\
+\hline
+India & NA & NA & 5.066 & 8.023 & 31.093 \\
+\hline
+South Africa & 231.681 & 4.013 &  320.114 & 248.818 & 228.993\\
+\hline
+USA &  22.038 & 294.328 & 270.981 & 74.357 & 86.714\\
+\hline
+\end{tabular}
+\caption{Table showing the latency between destinations and different traceroute servers (in ms).}
+\label{tab:simple}
+\end{table}
+
+Observations:
+\begin{itemize}
+    \item Latency seems to be related to the number of hops. Latency depends on a number of factors like traffic between the routers, processing time at the routers etc. Also higher number of hops means a higher chance of getting stuck in traffic and more time consumed at routers. Hence increase in number of hops increases the latency as well.
+
+\end{itemize}
+
+
+\subsection{Distributed servers}
+We find that servers like \underline{www.iitd.ac.in}, \underline{www.utah.edu} and \underline{www.uct.ac.za} are resolved to same IP address irrespective of from where they are getting the traceroute request, whereas servers like \underline{www.google.com} and \underline{www.facebook.com} have different destination IP's for different parts of world. 
+\\
+The reason for this is because big MNC's like google and Facebook need to provide their users with as low latency as possible and also that is economically optimal for them so they create their databases across the globe each acting as a server with unique IP. However educational institutes like \underline{utha.edu}, \underline{iitd.ac.in} have a single server for them. 
+\subsection{Distributed Servers of Google and Facebook}
+The IPv4 addresses of Google and Facebook are obtained by sending  traceroute requests to them through different locations namely:
+\begin{itemize}
+    \item IITD WiFi.
+    \item Princeton traceroute server \underline{www.net.princeton.edu}.
+    \item HanNet Germany server.
+\end{itemize}
+The IPv4 addresses of the destination is summarised in the table below.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Source \& Destination & www.google.com & www.facebook.com \\
+\hline
+IITD Wifi & 142.250.206.142 & 157.240.16.35  \\
+\hline
+Princeton & 142.250.65.238 & 31.13.71.36 \\
+\hline
+HanNet &  172.217.18.14 & 157.240.210.35\\
+\hline
+\end{tabular}
+\caption{Table showing the IPv4 address of various Google and Facebook servers.}
+\label{tab:simple}
+\end{table}
+
+
+The number of hops and latency for the traceroute requests between the source and destinations can be summarised in the tables below (for latency average of the latency by three packets sent is taken).
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Source \& Destination & www.google.com & www.facebook.com \\
+\hline
+IITD Wifi & 11 & 13  \\
+\hline
+Princeton & 20 & 20 \\
+\hline
+HanNet &  23 & 24\\
+\hline
+\end{tabular}
+\caption{Table showing \textit{\#}hops to various Google and Facebook servers from IITD WiFi.}
+\label{tab:simple}
+\end{table}
+
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Source \& Destination & www.google.com & www.facebook.com \\
+\hline
+IITD Wifi & 8.373 & 38.891  \\
+\hline
+Princeton & 334.253 & 314.255 \\
+\hline
+HanNet &  404.218 & 201.761\\
+\hline
+\end{tabular}
+\caption{Table showing the latency of various Google and Facebook servers from IITD WiFi.}
+\label{tab:simple}
+\end{table}
+
+
+Observation:
+\begin{itemize}
+    \item Here also we see that traceroute requests to same server but with different IP address have different paths and latencies.
+    \item Also the latencies and \textit{\#}hops are related to each other as increase in \textit{\#}hops roughly increases the latency too.
+    \item Last but not the least, IP addresses for the server nearer to the source have very low latency as compared to other IP addresses.
+    \item Some IP adresses are optimised for my location and hence they have very few hops and latencies but other IP's that are way too far off and hence are longer.
+\end{itemize}
+
+
+\subsection{Tracerouting to Google and Facebook from different sources}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Source \& Destination & www.google.com & www.facebook.com \\
+\hline
+Los Angeles, USA & 8 & 9  \\
+\hline
+Berlin, Germany & 14 & 12 \\
+\hline
+London, UK &  12 & 12    \\
+\hline
+Melbourne, Australia & 7 & 1 \\
+\hline
+Johannesburg, South Africa & - & 10 \\
+\hline
+Mombasa, Kenya & 17 & 15 \\
+\hline
+\end{tabular}
+\caption{Table showing the number of hops to destinations from different traceroute servers.}
+\label{tab:simple}
+\end{table}
+
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Source \& Destination & www.google.com & www.facebook.com \\
+\hline
+Los Angeles, USA & 7.861 & 10.717  \\
+\hline
+Berlin, Germany & 150.234 & 157.013 \\
+\hline
+London, UK &  131.682 & 128.631\\
+\hline
+Melbourne, Australia & 11.528 & 11.823 \\
+\hline
+Johannesburg, South Africa & - & 226.6 \\
+\hline
+Mombasa, Kenya & 340.216 & 310.067 \\
+\hline
+\end{tabular}
+\caption{Table showing the average latency to destinations from different traceroute servers (in ms)}
+\label{tab:simple}
+\end{table}
+
+
+Observations:
+\begin{itemize}
+    \item We notice that the \textit{\#}hops and latency for South African cities are significantly more than that of cities like Los Angeles, Melbourne etc.
+    \item Assuming that the most developed cities like Los Angeles, Melbourne etc must have their local ISP's directly peered with Google and Facebook. We can say that cities like Mombasa and Johannesburg doesn't have their local ISP's directly peered with Google and Facebook.
+\end{itemize}
+
+\newpage
+\section{Part4}
+\subsection{Part a}
+In this part we started wireshark and captured the packets for 2 sites \underline{www.iitd.ac.in} and \underline{http://act4d.iitd.ac.in}.\\ \\
+Now we apply the DNS filter and got all the dns requests and responses and after subtracting the response time with request time we get the time for dns request-response, for www.iitd.ac.in it is:
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+Response time \& type of request & www.iitd.ac.in & http://act4d.iitd.ac.in \\
+\hline
+AAAA & 7.694 ms & 3.916 ms  \\
+\hline
+A & 7.647 ms & 3.853 ms \\
+\hline
+HTTP &  7.602 ms & 3.798 ms\\
+\hline
+\end{tabular}
+\caption{Table showing the response time with different request for 2 sites (in ms)}
+\label{tab:simple}
+\end{table}
+
+
+
+
+\includegraphics[width = 17.5 cm, height = 2 cm]{Screenshot 2023-08-13 at 4.35.39 PM.png}
+pic for www.iitd.ac.in\\ \\
+\includegraphics[width = 17.5 cm , height = 2 cm]{Screenshot 2023-08-13 at 4.37.15 PM.png}
+pic for http://act4d.iitd.ac.in
+% \caption{ pic for www.iitd.ac.in}
+\subsection{Part b}
+Now applying the http filter and get those packets 
+\begin{itemize}
+    \item no. of http request generated for www.iitd.ac.in is :- \textbf{1} beacuse this site has secured http so 1 request is visible not css ,js etc.
+    \item no. of http request generated for http://act4d.iitd.ac.in is :- \textbf{12} beacuse this website is not secured  so we can see how many request these pages have
+\end{itemize}
+with seeing the http request for act4d website we can see how webpages are structured and how browser render complex images and files. we can see. so we can see that first application javascript is requested and then templates pages such as html , css , text etc. are requested and then rendered. after they are completed media pages such as images, video , favicon etc. are requested and then rendered.
+
+\includegraphics[width = 17.5 cm, height = 3 cm]{Screenshot 2023-08-13 at 4.36.23 PM.png}
+pic for www.iitd.ac.in\\ \\
+\includegraphics[width = 17.5 cm , height = 10 cm]{Screenshot 2023-08-13 at 4.38.08 PM.png}
+pic for http://act4d.iitd.ac.in
+
+\subsection{Part c}
+Now we apply the ((ip.src==192.168.1.3 \&\& ip.dst==10.7.174.111) or (ip.src==10.7.174.111 \&\& ip.dst==192.168.1.3)) \&\& TCP filter and answer of 3 questions are given below:
+\begin{itemize}
+    \item now we need to find the no. of tcp connections opened between my browser and web-server. as stated a tcp connection is 3-way handshake, our browser,client, sends SYN message to server , server replies with SYN-ACK message and then client sends an ACK. now to find no. of connecteions opened we just need to count no. of SYN request and we get that count as \textbf{6}
+    \item now we find that this is not same and less than number of HTTP requests for content objects in prevoius part due to the fact that multiple http objects get transferred over same tcp connection due to HTTP/1.1 protocol being alive to reduce latency
+    \item Yes, as stated above multiple HTTP content being fetched over same TCP connection due to the fact the HTTP/1.1 protocol is present and its ability to reuse existing connections for multiple requests to reduce latency.
+\end{itemize}
+\subsection{Part d}
+Now applying trace for \textbf{http://www.indianexpress.com} and we apply the http filter. suprisingly we found that there is no HTTP traffic visible over the network as we only found 1 http request for indianexpress.com visible. \\ \\
+now bowsing through the entire trace without any filters but we cannot see any contents of html and javascript files being transfered. so the reason for that is that this website and many other uses \textbf{HTTP secure}  which encrypts the traffic, making it difficult to directly see the contents of the transferred files in plaintext. \\ \\
+therefore we are not able to view the HTTP traffic like the act4d.iitd.ac.in 
+\newpage
 
 \newpage
 
 
-\section{E: Changing L2 Cache Associativity}
-\subsection{Plots}
 
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_small.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_medium.png}
-\includegraphics[width = 8.5cm, keepaspectratio]{images/plot5_large.png}
-
-
-\subsection{Observations}
-\begin{itemize}
-    \item We see that increasing associativity in L2 cache has less significance compared to increasing the size of L2 cache or increasing associativity in L1 cache. This is because L2 is farther away from the processor than L1 cache, and is accessed less frequently.
-    \item L2 cache is way larger than L1 cache, so it has already a lower miss rate. Increasing associativity in L2 cache would only provide a marginal improvement in reducing the conflict misses. 
-    \item Also, in traces 2 and 7 the performance decreases past associativity of 2. This may be caused because of the trace file and also because the associativity change alters the access order and thus again reaching to an optimum and then decreasing performance again.
-\end{itemize}
 
 
 \end{document}
