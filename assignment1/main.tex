@@ -46,8 +46,9 @@ Some points to be considered:
     % \item All the plots are generated from the Python matplotlib library, the code for which is provided \href{https://drive.google.com/drive/folders/1ggkQp2t3NUP2j-lU_Dst7DpPSrZ3AbAS?usp=sharing}{\textcolor{blue}{here}} (in the file named run.py see createPlot).
     % \item The summary containing the data of time taken (in ns) is \href{https://drive.google.com/file/d/1tbcX3iz1-sOLc5bymLP_e-yGbUJjtBvu/view?usp=sharing}{\textcolor{blue}{here}}.
     % \item The plots used in the report can be seen \href{https://drive.google.com/drive/folders/170nIbyIFCMwzpfevd__3WixwtmWZnnlW?usp=share_link}{\textcolor{blue}{here}}.
-    \item Parts 1 and 3 are done by Mani and parts 2 and 4 are done by Harshit.
+    
     \item All the codes are managed on GitHub and can also be found in this \href{https://drive.google.com/drive/folders/1QKKCJGQ5x3ZLXGFgR8Z5mXXcyV3pBJWg?usp=sharing}{\underline{folder}}. 
+    \item We both have Macbook so any functionality that is only specific to Windows Command Shell or Power Shell couldn't be concluded by us.
     
 
     
@@ -396,7 +397,7 @@ Now we apply the ((ip.src==192.168.1.3 \&\& ip.dst==10.7.174.111) or (ip.src==10
     \item Yes, as stated above multiple HTTP content being fetched over same TCP connection due to the fact the HTTP/1.1 protocol is present and its ability to reuse existing connections for multiple requests to reduce latency.
 \end{itemize}
 \subsection{Part d}
-Now applying trace for \textbf{http://www.indianexpress.com} and we apply the http filter. suprisingly we found that there is no HTTP traffic visible over the network as we only found 1 http request for indianexpress.com visible. \\ \\
+Now applying trace for \textbf{http://www.indianexpress.com} and we apply the http filter. suprisingly we found that there is no HTTP traffic visible over the network as we only found 1 http request for indianexpress.com visible of HTTP/1.1 protocol visible \\ \\
 now bowsing through the entire trace without any filters but we cannot see any contents of html and javascript files being transfered. so the reason for that is that this website and many other uses \textbf{HTTP secure}  which encrypts the traffic, making it difficult to directly see the contents of the transferred files in plaintext. \\ \\
 therefore we are not able to view the HTTP traffic like the act4d.iitd.ac.in 
 \newpage
