@@ -1,0 +1,22 @@
+Discussion on 19 August (Saturday)
+
+We have to communicate with each other and one of us have to also act as a database
+All would have the database for the line numbers so that the database guy is not overloaded with
+requests.
+The database person will keep both line number and line and others will keep only line number in their hashes
+
+
+Could be done in java or python but right now we will use python (sockets)
+
+
+Mani and Satyam cant connect also Rajat and Harshit can't connect using the code updated now.
+
+One solution could be 
+Mani  - Harshit 
+Rajat - Satyam 
+communicate with each other
+
+and 
+Mani - Rajat communicate with each other finally !
+
+This only seems vialble as of now. But the problem will arise in case of bookkeeping the lines received.
