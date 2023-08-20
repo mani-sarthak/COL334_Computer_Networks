@@ -6,7 +6,7 @@ port = 4000
 ThreadCount = 0
 
 def client_handler(connection):
-    connection.send(str.encode('You are now connected to the replay server... Type BYE to stop'))
+    connection.send(str.encode('You are  now connected to the replay server... Type BYE to stop'))
     while True:
         data = connection.recv(2048)
         message = data.decode('utf-8')
