@@ -108,16 +108,16 @@ class Peer:
 
 
 def get_send():
-    peer=Peer("10.184.49.71",5000)
+    peer=Peer("10.184.42.12",6000)
     peer.start()
     # peer.connect("vayu.iitd.ac.in",9801)
-    # host1=()
-    # host2=()
-    # host3=()
-    # peer.connect(host1)
-    # peer.connect(host2)
-    # peer.connect(host3)
-    peer.talk_with_vayu()
+    # host1=("10.184.49.71", 6000)
+    # host2=("10.184.15.146", 6000)
+    # host3=("10.184.1.210", 6000)
+    # peer.connect(host1[0], host1[1])
+    # peer.connect(host2[0], host2[1])
+    # peer.connect(host3[0], host3[1])
+    # peer.talk_with_vayu()
 
 get_send()
     
