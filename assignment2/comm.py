@@ -2,6 +2,10 @@ import socket
 import threading
 import time
 
+"""
+command to kill opened port :  lsof -i :7202 | awk 'NR > 1 {print $2}' | xargs kill  
+"""
+
 def server_thread_func(server_socket, lines):
     while True:
         conn, address = server_socket.accept()

@@ -33,12 +33,13 @@ def main():
     lines = []
 
     server_socket = socket.socket()
-    server_socket.bind(('localhost', 7202))
+    server_socket.bind(('172.20.10.3', 7203))
     server_socket.listen(4)
     time.sleep(10)
     client_socket = socket.socket()
-    client_socket.connect(('localhost', 7201))
-
+    client_socket.connect(('172.20.10.4', 7201))
+    client_socket_2 = socket.socket()
+    client_socket_2.connect(('172.20.10.5', 7202))
     server_thread = threading.Thread(target=server_thread_func, args=(server_socket, lines))
     server_thread.start()
 
@@ -46,8 +47,12 @@ def main():
         print("\nEnter 'c' for client mode, 's' for server mode, or 'exit' to quit:")
         choice = input("Choice: ")
 
-        if choice == 'c':
+        if choice == 'c1':
             client_thread = threading.Thread(target=client_sender, args=(client_socket,lines))
+            client_thread.start()
+            client_thread.join()
+        elif choice == 'c2':
+            client_thread = threading.Thread(target=client_sender, args=(client_socket_2,lines))
             client_thread.start()
             client_thread.join()
         elif choice == 's':
