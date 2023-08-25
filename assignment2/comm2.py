@@ -19,13 +19,14 @@ def handle_client(conn, address, lines):
         conn.sendall('Received: '.encode() + data.encode())
     conn.close()
 
-def client_sender(client_socket):
+def client_sender(client_socket,lines):
     while True:
         line = input("Enter data to send to server at port 7002 (or 'exit' to return to menu): ")
         if line == 'exit':
             break
         client_socket.sendall(line.encode())
         data = client_socket.recv(1024).decode()
+        lines.append(data)
         print('Server response:', data)
 
 def main():
@@ -46,7 +47,7 @@ def main():
         choice = input("Choice: ")
 
         if choice == 'c':
-            client_thread = threading.Thread(target=client_sender, args=(client_socket,))
+            client_thread = threading.Thread(target=client_sender, args=(client_socket,lines))
             client_thread.start()
             client_thread.join()
         elif choice == 's':
