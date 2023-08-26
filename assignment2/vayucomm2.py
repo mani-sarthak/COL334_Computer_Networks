@@ -2,28 +2,32 @@ import socket
 import threading
 import time
 from vayuclient import inc_num_lines,recv_input
-def server_thread_func(server_socket, lines):
+def server_thread_func(server_socket, lines, sockets):
     while True:
         conn, address = server_socket.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, address, lines))
+        sockets.append(conn)
+        thread = threading.Thread(target=handle_client, args=(conn, address, lines,sockets))
         thread.start()
 
 # send to other client acting us as a server
-def handle_client(conn, address, data_dict,client2):
+def handle_client(conn, address, data_dict,sockets):
     print("Connected to client", address)
     while True:
         data = recv_input(conn)
         if not data:
             break
-        client2.sendall(data)
-        lines = data.split("\n")
+        lines = data.split("\n")            
         line_number = int(lines[0])
         line_content = lines[1]
+        if(conn==sockets[0]):
+            sockets[1].sendall(data)
+        else:
+            sockets[0].sendall(data)
         data_dict[line_number] = line_content
         # conn.sendall('Received: '.encode() + data.encode())
     conn.close()
 
-# send to other server by me acting as client
+# # send to other server by me acting as client
 def client_sender(client_socket,data_dict):
     while True:
         # line = input("Enter data to send to server at port 7002 (or 'exit' to return to menu): ")
@@ -56,7 +60,7 @@ def client_vayu(client_socket,client_socket_2,data_dict,start):
                     continue
                 if line_number not in data_dict:
                     data_dict[line_number] = line_content
-                    fmess=str(line_number)+'\n'+line_content+'\n'
+                    fmess="Rajat:"+'\n'+str(line_number)+'\n'+line_content+'\n'
                     client_socket.sendall(fmess.encode())
                     client_socket_2.sendall(fmess.encode())
             print("Submitting...")
@@ -78,7 +82,7 @@ def client_vayu(client_socket,client_socket_2,data_dict,start):
 def main():
     start = time.time()
     data_dict={}
-
+    sockets = []
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind(('10.184.15.146', 7205))
@@ -90,7 +94,7 @@ def main():
     client_socket_2.connect(('10.184.36.175', 7204))
     # client_socket_2 = socket.socket()
     # client_socket_2.connect(('vayu',9801))
-    server_thread = threading.Thread(target=server_thread_func, args=(server_socket, data_dict))
+    server_thread = threading.Thread(target=server_thread_func, args=(server_socket, data_dict,sockets))
     server_thread.start()
 
     while True:
