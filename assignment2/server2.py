@@ -3,10 +3,11 @@ import socket
 
 def server_program():
     # get the hostname
-    host = '10.184.15.146'
-    port = 4500  # initiate port no above 1024
+    host = '127.0.0.1'
+    port = 7000  # initiate port no above 1024
 
     server_socket = socket.socket()  # get instance
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # look closely. The bind() function takes tuple as argument
     server_socket.bind((host, port))  # bind host address and port together
 

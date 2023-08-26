@@ -15,10 +15,11 @@ def handle_client(conn, address):
     conn.close()
 
 def server_program():
-    host = '172.20.10.4'
-    port = 6001
+    host = '127.0.0.1'
+    port = 7000
 
     server_socket = socket.socket()
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((host, port))
     server_socket.listen(4)
 
