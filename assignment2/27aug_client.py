@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 data_dict={}
-host = '10.184.16.101'
+host = '10.184.3.151'
 port = 8321
 from vayuclient import inc_num_lines,recv_input
 def receive_thread(socket):
@@ -47,8 +47,8 @@ def send_thread(csocket):
                             continue
                         if line_number not in data_dict:
                             data_dict[line_number] = line_content
-                            fmess=str(line_number)+'\n'+line_content+'\n'
-                            csocket.sendall(fmess.encode())
+                            # fmess=
+                            csocket.sendall(received_data.encode())
                     print("Submitting...")
                     submit_command = b"SUBMIT\naseth@col334-672\n" + str(line_num).encode() + b"\n"
                     s.sendall(submit_command)
