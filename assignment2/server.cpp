@@ -1,57 +1,67 @@
-#include<iostream>
-#include<cstring>
-#include<unistd.h>
-#include<arpa/inet.h>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
-using namespace std;
-
-int main(){
-    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if(server_socket == -1){
-        cout << "creating in socket error" << endl;
-        return -1;
+int main() {
+    // Create a socket
+    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket == -1) {
+        std::cerr << "Error creating socket" << std::endl;
+        return 1;
     }
 
-    sockaddr_in server_addr;
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(1234);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
+    // Bind the socket
+    sockaddr_in serverAddress;
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(8001); // Port number
 
-    // if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr))==-1){
-    //     cout << "bind error" << endl;
-    //     return -1;
-    // }
-    cout<<"server is listening..."<<endl;
-    if (listen(server_socket, 5) == -1){
-        cout << "server listened but none responded" << endl;
-        return -1;
+    if (bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == -1) {
+        std::cerr << "Error binding socket" << std::endl;
+        return 1;
     }
-    sockaddr_in client_addr;
-    socklen_t client_addr_size = sizeof(client_addr);
 
-    int client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
-    if(client_socket==-1){
-        cout<<"error accepting connection"<<endl;
-        return -1;
+    // Listen for incoming connections
+    if (listen(serverSocket, 5) == -1) {
+        std::cerr << "Error listening on socket" << std::endl;
+        return 1;
     }
-    cout <<"connection estabilished"<<endl;
-    char buffer[1024];
 
-    while(true){
-        memset(buffer, 0, sizeof(buffer));
-        int recv_size = recv(client_socket, buffer, sizeof(buffer), 0);
-        if(recv_size <=0){
-            cout << "client disconnected" << endl;
-            break;
+    std::cout << "Server is listening for incoming connections..." << std::endl;
+
+    // Accept and handle client connections
+    while (true) {
+        sockaddr_in clientAddress;
+        socklen_t clientAddrSize = sizeof(clientAddress);
+        int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &clientAddrSize);
+        if (clientSocket == -1) {
+            std::cerr << "Error accepting client connection" << std::endl;
+            continue;
         }
-        cout << "client: " << buffer << endl;
 
-        cout<< "-> ";
-        string msg;
-        getline(cin, msg);
-        send(client_socket, msg.c_str(), msg.size(), 0);
+        std::cout << "Client connected" << std::endl;
+
+        // Handle client messages
+        char buffer[1024];
+        while (true) {
+            int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+            if (bytesRead <= 0) {
+                std::cout << "Client disconnected" << std::endl;
+                close(clientSocket);
+                break;
+            }
+
+            buffer[bytesRead] = '\0';
+            std::cout << "Client: " << buffer << std::endl;
+
+            // Send a response back to the client
+            send(clientSocket, buffer, bytesRead, 0);
+        }
     }
-    close(client_socket);
-    close(server_socket);
+
+    close(serverSocket);
     return 0;
 }
