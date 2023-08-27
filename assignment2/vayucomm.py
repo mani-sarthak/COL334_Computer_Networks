@@ -2,10 +2,10 @@ import socket
 import threading
 import time
 from vayuclient import inc_num_lines,recv_input
-def server_thread_func(server_socket, lines):
+def server_thread_func(server_socket, data_dict):
     while True:
         conn, address = server_socket.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, address, lines))
+        thread = threading.Thread(target=handle_client, args=(conn, address, data_dict))
         thread.start()
 
 # send to other client acting us as a server
@@ -22,7 +22,7 @@ def handle_client(conn, address, data_dict):
         # conn.sendall('Received: '.encode() + data.encode())
     conn.close()
 
-# send to other server by me acting as client
+# receive from other server by me acting as client
 def client_sender(client_socket,data_dict):
     while True:
         # line = input("Enter data to send to server at port 7002 (or 'exit' to return to menu): ")
@@ -79,11 +79,11 @@ def main():
 
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(('10.184.15.146', 7204))
+    server_socket.bind(('10.184.36.175', 7255))
     server_socket.listen(4)
     time.sleep(10)
     client_socket = socket.socket()
-    client_socket.connect(('10.184.36.175', 7203))
+    client_socket.connect(('10.184.15.146', 7890))
     # client_socket_2 = socket.socket()
     # client_socket_2.connect(('vayu',9801))
     server_thread = threading.Thread(target=server_thread_func, args=(server_socket, data_dict))
@@ -112,7 +112,7 @@ def main():
     client_socket.close()
     server_socket.close()
     # client_socket_2.close()
-    # server_thread.join()
+    server_thread.join()
 
 if __name__ == '__main__':
     main()

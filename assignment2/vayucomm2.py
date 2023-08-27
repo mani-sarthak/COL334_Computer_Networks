@@ -20,9 +20,9 @@ def handle_client(conn, address, data_dict,sockets):
         line_number = int(lines[0])
         line_content = lines[1]
         if(conn==sockets[0]):
-            sockets[1].sendall(data)
+            sockets[1].sendall(data.encode())
         else:
-            sockets[0].sendall(data)
+            sockets[0].sendall(data.encode())
         data_dict[line_number] = line_content
         # conn.sendall('Received: '.encode() + data.encode())
     conn.close()
@@ -60,7 +60,7 @@ def client_vayu(client_socket,client_socket_2,data_dict,start):
                     continue
                 if line_number not in data_dict:
                     data_dict[line_number] = line_content
-                    fmess="Rajat:"+'\n'+str(line_number)+'\n'+line_content+'\n'
+                    fmess=str(line_number)+'\n'+line_content+'\n'
                     client_socket.sendall(fmess.encode())
                     client_socket_2.sendall(fmess.encode())
             print("Submitting...")
@@ -85,13 +85,14 @@ def main():
     sockets = []
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server_socket.bind(('10.184.15.146', 7205))
+    server_socket.bind(('10.184.36.175', 15204))
     server_socket.listen(4)
     time.sleep(10)
-    client_socket = socket.socket()
-    client_socket.connect(('10.184.36.175', 7204))
     client_socket_2 = socket.socket()
-    client_socket_2.connect(('10.184.36.175', 7204))
+    client_socket_2.connect(('10.184.15.146', 15201))
+    client_socket = socket.socket()
+    client_socket.connect(('10.184.1.210', 15203))
+    
     # client_socket_2 = socket.socket()
     # client_socket_2.connect(('vayu',9801))
     server_thread = threading.Thread(target=server_thread_func, args=(server_socket, data_dict,sockets))
