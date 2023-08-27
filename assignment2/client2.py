@@ -2,8 +2,8 @@ import socket
 
 
 def client_program():
-    host = '10.184.15.146' # host 
-    port = 6001   # socket server port number
+    host = '10.184.36.175' # host 
+    port = 7500   # socket server port number
 
     client_socket = socket.socket()  # instantiate
     client_socket.connect((host, port))  # connect to the server
