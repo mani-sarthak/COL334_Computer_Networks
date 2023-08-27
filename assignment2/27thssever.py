@@ -13,16 +13,19 @@ def handle_client(conn, address):
         for k in server_list:
             # k.send(response.encode())
             k.send(data.encode())
-        response = input(' -> ')
-        for k in server_list:
-            k.send(response.encode())
+        
             # k.send(data.encode())
         # conn.send(response.encode())  # send data to the client
     conn.close()
 
+def send_client():
+    response = input(' -> ')
+    for k in server_list:
+       k.send(response.encode())
+
 def server_program():
     host = '192.168.197.164'
-    port = 7201
+    port = 7212
     thread_list=[]
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # wrong line
