@@ -9,7 +9,7 @@
 using namespace std;
 
 vector<int> clients;
-void handle_client( int client_socket) {
+void handle_client(int client_socket) {
     clients.push_back(client_socket);
     cout << "Client " << client_socket << " connected." <<endl;
 
@@ -44,7 +44,7 @@ int main() {
 
     sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(12345);
+    server_address.sin_port = htons(9001);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
     // if (bind(server_socket, (struct sockaddr *)&server_address, sizeof(server_address)) == -1) {
@@ -68,7 +68,12 @@ int main() {
             continue;
         }
 
-        std::thread client_thread(handle_client, client_socket);
+        // Create a lambda expression that calls the handle_client() function.
+        auto client_thread = std::thread([client_socket]() {
+            handle_client(client_socket);
+        });
+
+        // Detach the thread so that it does not block the main thread.
         client_thread.detach();
     }
 
