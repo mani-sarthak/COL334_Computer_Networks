@@ -21,7 +21,7 @@ def recv_input(sock):
   return input_buffer.decode('utf-8')
 
 
-def  sending_client(conn,address):
+def sending_client(conn,address):
     for keys in data_dict.keys():
         # print(f'finally sending {keys}')
         data = str(keys) + '\n' + data_dict[keys]
@@ -53,26 +53,26 @@ def handle_client(conn, address):
             for client_conn in server_list:
                 if client_conn!=conn:
                     client_conn.send(data.encode())
-        if len(data_dict)==1000:
+        # if len(data_dict)==1000:
             # finish1 = True
             # for keys in data_dict.keys():
             #     print(f'finally sending {keys}')
             #     data = str(keys) + '\n' + data_dict[keys] + '\n'
             #     conn.sendall(data.encode())
-            print(f'final sending 1000 lines to : {address}')
-            for keys in data_dict.keys():
-            # print(f'finally sending {keys}')
+            # for keys in data_dict.keys():
+                # print(f'final sending 1000 lines to : {address}')
+            # # print(f'finally sending {keys}')
                 # data = str(keys) + '\n' + data_dict[keys] +'\n'
-                conn.sendall(data.encode())
+                # conn.sendall(data.encode())
                 
             # client_thread_final = threading.Thread(target=sending_client, args=(conn, address))
             # client_thread_final.start()
-            time.sleep(20)
-            break 
-    # with broadcast_lock:
-    #     server_list.remove(conn)
-    #     print("Client disconnected:", address)
-    # conn.close()
+            # time.sleep(20)
+            # break 
+    with broadcast_lock:
+        server_list.remove(conn)
+        print("Client disconnected:", address)
+    conn.close()
 
 def start_broadcasting():
     global broadcasting_started
@@ -96,35 +96,60 @@ def broadcast_thread():
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(5)
                 s.connect(server_address)
-                while len(data_dict) < line_num:
-                    print(len(data_dict))
-                    s.sendall(sendline_command)
-                    received_data = recv_input(s)
-                    try:
-                        lines = received_data.split("\n")
-                        line_number = int(lines[0])
-                        line_content = lines[1]
-                    except (ValueError, IndexError):
-                        continue
-                    if line_number == -1:
-                        time.sleep(1e-6)
-                        continue
-                    if line_number not in data_dict:
-                        data_dict[line_number] = line_content
+                if len(data_dict)<line_num:
+                    while len(data_dict) < line_num:
+                        print(len(data_dict))
+                        s.sendall(sendline_command)
+                        received_data = recv_input(s)
+                        try:
+                            lines = received_data.split("\n")
+                            line_number = int(lines[0])
+                            line_content = lines[1]
+                        except (ValueError, IndexError):
+                            continue
+                        if line_number == -1:
+                            time.sleep(1e-6)
+                            continue
+                        if line_number not in data_dict:
+                            data_dict[line_number] = line_content
                         with broadcast_lock:
                             for client_conn in server_list:
                                 # print('line is sending form server')
                                 client_conn.send(received_data.encode())
-                submit_command = b"SUBMIT\naseth@col334-672\n" + str(line_num).encode() + b"\n"
-                s.sendall(submit_command)
-                for key in data_dict.keys():
-                    s.sendall(str(key).encode() + b"\n" + data_dict[key].encode() + b"\n")
-                submission_success = recv_input(s)
-                print(submission_success)
-            finish = time.time()
-            print(f"Time taken: {finish - start}")
-            finish1.append(1)
-            break
+                    submit_command = b"SUBMIT\naseth@col334-672\n" + str(line_num).encode() + b"\n"
+                    s.sendall(submit_command)
+                    for key in data_dict.keys():
+                        s.sendall(str(key).encode() + b"\n" + data_dict[key].encode() + b"\n")
+                    submission_success = recv_input(s)
+                    print(submission_success)
+                    finish = time.time()
+                    print(f"Time taken: {finish - start}")
+                    finish1.append(1)
+                else:
+                    i=0
+                    while True:
+                        # print(len(data_dict))
+                        # s.sendall(sendline_command)
+                        # time.sleep(5e-6)
+                        # received_data = recv_input(s)
+                        # try:
+                        #     lines = received_data.split("\n")
+                        #     line_number = int(lines[0])
+                        #     line_content = lines[1]
+                        # except (ValueError, IndexError):
+                        #     continue
+                        # if line_number == -1:
+                        #     time.sleep(1e-6)
+                        #     continue
+                        # if line_number not in data_dict:
+                            # data_dict[line_number] = line_content
+                        received_data =  str(i%1000)+'\n'+data_dict[i%1000]+'\n'
+                        with broadcast_lock:
+                            for client_conn in server_list:
+                                # print('line is sending form server')
+                                client_conn.send(received_data.encode())
+                        i+=1
+        # break
         # except (socket.timeout, ConnectionError):
         #     print("Connection error")
         #     break
@@ -158,6 +183,8 @@ def connection_accept_thread1(server_socket):
         print(f'client connected : {address}')
         client_thread = threading.Thread(target=handle_client, args=(conn, address))
         client_thread.start()
+        client_thread1=threading.Thread(target=sending_client,args=(conn,address))
+        client_thread1.start()
         thread_list.append(client_thread)
         # if len(server_list)==3:
         #     break
@@ -165,7 +192,7 @@ def connection_accept_thread1(server_socket):
 thread_list = []
 def server_program():
     host = '10.194.22.115'
-    port = 8225
+    port = 8230
 
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
