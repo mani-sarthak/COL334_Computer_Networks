@@ -3,7 +3,7 @@ import threading
 import time 
  
 host = '10.194.22.115' # server address and port !
-port = 8221
+port = 8229
 
 started = False
 
@@ -15,6 +15,20 @@ def inc_num_lines(submission_response):
         return num_lines
     return None
 
+def recv_input(sock):
+  input_buffer = b''
+  while True:
+    
+    packet = sock.recv(1024)
+    input_buffer += packet
+    if packet.endswith(b'\n'):
+      break
+  if not input_buffer.endswith(b'\n'):
+    input_buffer += b'\n'
+  return input_buffer.decode('utf-8')
+
+
+
 def receive_thread(socket):
     global started
     while True:
@@ -25,11 +39,12 @@ def receive_thread(socket):
         
     while True:
         try:
-            received_data = socket.recv(2048).decode('utf-8')
+            received_data = recv_input(socket)
             try:
                 lines = received_data.split("\n")
                 line_number = int(lines[0])
                 line_content = lines[1]
+                print(line_number," recieved from server")
             except (ValueError, IndexError):
                 continue
             if line_number == -1:
@@ -57,17 +72,7 @@ def receive_thread(socket):
 #             print('Error sending:', str(e))
 #             break
 
-def recv_input(sock):
-  input_buffer = b''
-  while True:
-    
-    packet = sock.recv(1024)
-    input_buffer += packet
-    if packet.endswith(b'\n'):
-      break
-  if not input_buffer.endswith(b'\n'):
-    input_buffer += b'\n'
-  return input_buffer.decode('utf-8')
+
 
 def vayu_thread(socket,socket2):
     global started
