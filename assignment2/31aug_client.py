@@ -3,7 +3,7 @@ import threading
 import time 
  
 host = '10.194.22.115' # server address and port !
-port = 8221
+port = 8222
 
 started = False
 
@@ -39,7 +39,7 @@ def receive_thread(socket):
                 print(line_content)
                 data_dict[line_number] = line_content
             # print('Server response:', response)
-        except socket.error as e:
+        except Exception as e:
             print('Error receiving:', str(e))
             break
         if len(data_dict)==line_num:
