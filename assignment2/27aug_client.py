@@ -1,20 +1,28 @@
 import socket
 import threading
-import time
-data_dict={}
-host = '10.184.16.101'
-port = 8321
-from vayuclient import inc_num_lines,recv_input
+
+host = '192.168.197.164'
+port = 7212
+
 def receive_thread(socket):
     while True:
         try:
-            response = socket.recv(2048).decode('utf-8')
-            print('Server response:', response)
+            data = recv_input(socket)
+            lines = data.split("\n")
+            line_number = int(lines[0])
+            line_content = lines[1]
+            data_dict[line_number] = line_content
+            if (len(data_dict)==1000):
+                break
+            # response = socket.recv(2048).decode('utf-8')
+            # print('Server response:', response)
         except socket.error as e:
             print('Error receiving:', str(e))
             break
 
-def send_thread(socket):
+
+def send_thread(csocket):
+    start = time.time()
     while True:
             # input_message = input('Your message: ')
             server_address = ("vayu.iitd.ac.in", 9801) # do we have to restablish again and again
@@ -61,8 +69,10 @@ except socket.error as e:
     print(str(e))
     exit()
 
+
 receive_thread = threading.Thread(target=receive_thread, args=(ClientSocket,))
 send_thread = threading.Thread(target=send_thread, args=(ClientSocket,))
+# vayu_thread = threading.Thread(target=vayu_bhai, args=(data_dict,))
 
 receive_thread.start()
 send_thread.start()
