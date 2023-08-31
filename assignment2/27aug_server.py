@@ -1,4 +1,3 @@
-
 import socket
 import threading
 import time
@@ -72,15 +71,14 @@ def broadcast_thread():
                 print(submission_success)
             finish = time.time()
             print(f"Time taken: {finish - start}")
-            break
         except (socket.timeout, ConnectionError):
             print("Connection error")
         except Exception as e:
             print("An error occurred:", e)
 
 def server_program():
-    host = '10.184.36.175'
-    port = 11111
+    host = '10.184.15.146'
+    port = 8221
     thread_list = []
 
     server_socket = socket.socket()
