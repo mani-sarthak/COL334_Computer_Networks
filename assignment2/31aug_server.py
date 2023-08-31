@@ -7,6 +7,7 @@ broadcast_list = []
 broadcast_lock = threading.Lock()
 data_dict = {}
 broadcasting_started=False
+finish1 = []
 
 def recv_input(sock):
   input_buffer = b''
@@ -19,28 +20,59 @@ def recv_input(sock):
     input_buffer += b'\n'
   return input_buffer.decode('utf-8')
 
+
+def  sending_client(conn,address):
+    for keys in data_dict.keys():
+        # print(f'finally sending {keys}')
+        data = str(keys) + '\n' + data_dict[keys]
+        conn.sendall(data.encode())
+    # with broadcast_lock:
+    #     server_list.remove(conn)
+    #     print("Client disconnected:", address)
+    # conn.close()
+    
 def handle_client(conn, address):
     # with broadcast_lock:
     #     server_list.append(conn)
     #     print("Client connected:", address)
+    # global finish1
         
     while True:
         data = recv_input(conn)
         # if not data:
         #     break
         lines = data.split("\n")
-        line_num = int(lines[0])
+        line_numb = int(lines[0])
         line_cont = lines[1]
-        data_dict[line_num] = line_cont
-        print("Received from connected user {}: {}".format(address, data))
+        if line_numb not in data_dict:
+            print("Received from connected user {}: {}".format(address, data))
+            print(line_cont)
+            data_dict[line_numb] = line_cont
+        # data_dict[line_num] = line_cont
         with broadcast_lock:
             for client_conn in server_list:
-                client_conn.send(data.encode())
-    
-    with broadcast_lock:
-        server_list.remove(conn)
-        print("Client disconnected:", address)
-    conn.close()
+                if client_conn!=conn:
+                    client_conn.send(data.encode())
+        if len(data_dict)==1000:
+            # finish1 = True
+            # for keys in data_dict.keys():
+            #     print(f'finally sending {keys}')
+            #     data = str(keys) + '\n' + data_dict[keys] + '\n'
+            #     conn.sendall(data.encode())
+            print(f'final sending 1000 lines to : {address}')
+            for keys in data_dict.keys():
+            # print(f'finally sending {keys}')
+                # data = str(keys) + '\n' + data_dict[keys] +'\n'
+                conn.sendall(data.encode())
+                
+            # client_thread_final = threading.Thread(target=sending_client, args=(conn, address))
+            # client_thread_final.start()
+            time.sleep(20)
+            break 
+    # with broadcast_lock:
+    #     server_list.remove(conn)
+    #     print("Client disconnected:", address)
+    # conn.close()
 
 def start_broadcasting():
     global broadcasting_started
@@ -56,6 +88,7 @@ def broadcast_thread():
     server_address = ("vayu.iitd.ac.in", 9801)
     sendline_command = b"SENDLINE\n"
     line_num = 1000
+    # global finish1
     while True:
         # message = input("Broadcast message: ")
         try:
@@ -80,6 +113,7 @@ def broadcast_thread():
                         data_dict[line_number] = line_content
                         with broadcast_lock:
                             for client_conn in server_list:
+                                # print('line is sending form server')
                                 client_conn.send(received_data.encode())
                 submit_command = b"SUBMIT\naseth@col334-672\n" + str(line_num).encode() + b"\n"
                 s.sendall(submit_command)
@@ -89,6 +123,8 @@ def broadcast_thread():
                 print(submission_success)
             finish = time.time()
             print(f"Time taken: {finish - start}")
+            finish1.append(1)
+            break
         # except (socket.timeout, ConnectionError):
         #     print("Connection error")
         #     break
@@ -113,23 +149,28 @@ def start_command_thread1():
         
 def connection_accept_thread1(server_socket):
     # print('hjhhhhhh')
-    while True:
+    # global finish1
+    # count=0
+    while len(server_list)<3:
         conn, address = server_socket.accept()
+        # count+=1
         server_list.append(conn)
         print(f'client connected : {address}')
         client_thread = threading.Thread(target=handle_client, args=(conn, address))
         client_thread.start()
         thread_list.append(client_thread)
+        # if len(server_list)==3:
+        #     break
         
 thread_list = []
 def server_program():
-    host = '192.168.197.7'
-    port = 8221
+    host = '10.194.22.115'
+    port = 8225
 
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((host, port))
-    server_socket.listen(4)
+    server_socket.listen(10)
 
     print("Server listening on {}:{}".format(host, port))
     # time.sleep(10)
@@ -138,6 +179,7 @@ def server_program():
     connection_accept_thread = threading.Thread(target=connection_accept_thread1,args = (server_socket,))
     connection_accept_thread.start()
     thread_list.append(connection_accept_thread)
+    # connection_accept_thread.join()
     
     start_command_thread = threading.Thread(target=start_command_thread1)
     start_command_thread.start()
@@ -148,6 +190,8 @@ def server_program():
     receive_thread = threading.Thread(target=broadcast_thread)
     receive_thread.start()
     thread_list.append(receive_thread)
+    connection_accept_thread.join()
+    
     
 
     # while True:
@@ -160,5 +204,5 @@ def server_program():
     # for k in thread_list:
     #     k.join()
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     server_program()
