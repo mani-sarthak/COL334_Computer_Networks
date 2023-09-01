@@ -2,10 +2,22 @@ import socket
 import threading
 import time 
  
-host = '10.194.22.115' # server address and port !
-port = 8229
+host = '10.194.6.73'
+port = 9009
 
 started = False
+
+def recv_input(sock):
+    input_buffer = b''
+    while True: 
+        packet = sock.recv(1024)
+        input_buffer += packet
+        if packet.endswith(b'\n'):
+            break
+    if not input_buffer.endswith(b'\n'):
+        input_buffer += b'\n'
+    return input_buffer.decode('utf-8')
+
 
 def inc_num_lines(submission_response):
     parts = submission_response.split(" - ")
@@ -15,24 +27,12 @@ def inc_num_lines(submission_response):
         return num_lines
     return None
 
-def recv_input(sock):
-  input_buffer = b''
-  while True:
-    
-    packet = sock.recv(1024)
-    input_buffer += packet
-    if packet.endswith(b'\n'):
-      break
-  if not input_buffer.endswith(b'\n'):
-    input_buffer += b'\n'
-  return input_buffer.decode('utf-8')
-
 
 
 def receive_thread(socket):
     global started
     while True:
-        receive = socket.recv(2048).decode('utf-8')
+        receive = recv_input(socket)
         if receive=='start':
             started=True
             break
@@ -44,7 +44,6 @@ def receive_thread(socket):
                 lines = received_data.split("\n")
                 line_number = int(lines[0])
                 line_content = lines[1]
-                print(line_number," recieved from server")
             except (ValueError, IndexError):
                 continue
             if line_number == -1:
@@ -54,7 +53,7 @@ def receive_thread(socket):
                 print(line_content)
                 data_dict[line_number] = line_content
             # print('Server response:', response)
-        except socket.error as e:
+        except Exception as e:
             print('Error receiving:', str(e))
             break
         if len(data_dict)==line_num:
@@ -71,8 +70,6 @@ def receive_thread(socket):
 #         except socket.error as e:
 #             print('Error sending:', str(e))
 #             break
-
-
 
 def vayu_thread(socket,socket2):
     global started
@@ -156,3 +153,5 @@ vayu_thread.join()
 
 print('Client threads closed.')
 ClientSocket.close()
+
+
