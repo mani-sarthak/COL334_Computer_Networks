@@ -15,8 +15,8 @@ def handle_client(conn, address):
     conn.close()
 
 def server_program():
-    host = '127.0.0.1'
-    port = 7000
+    host = '10.184.36.175'
+    port = 7500
 
     server_socket = socket.socket()
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

@@ -1,10 +1,9 @@
 import socket
 import threading
-import time
-data_dict={}
-host = '10.184.36.175'
-port = 11111
-from vayuclient import inc_num_lines,recv_input
+
+host = '192.168.197.164'
+port = 7212
+
 def receive_thread(socket):
     while True:
         try:
