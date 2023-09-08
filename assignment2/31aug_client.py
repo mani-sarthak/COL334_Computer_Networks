@@ -4,8 +4,22 @@ import time
  
 host = '10.194.22.115' # server address and port !
 port = 8230
+host = '10.194.6.73'
+port = 9009
 
 started = False
+
+def recv_input(sock):
+    input_buffer = b''
+    while True: 
+        packet = sock.recv(1024)
+        input_buffer += packet
+        if packet.endswith(b'\n'):
+            break
+    if not input_buffer.endswith(b'\n'):
+        input_buffer += b'\n'
+    return input_buffer.decode('utf-8')
+
 
 def inc_num_lines(submission_response):
     parts = submission_response.split(" - ")
@@ -15,24 +29,10 @@ def inc_num_lines(submission_response):
         return num_lines
     return None
 
-def recv_input(sock):
-  input_buffer = b''
-  while True:
-    
-    packet = sock.recv(1024)
-    input_buffer += packet
-    if packet.endswith(b'\n'):
-      break
-  if not input_buffer.endswith(b'\n'):
-    input_buffer += b'\n'
-  return input_buffer.decode('utf-8')
-
-
-
 def receive_thread(socket):
     global started
     while True:
-        receive = socket.recv(2048).decode('utf-8')
+        receive = recv_input(socket)
         if receive=='start':
             started=True
             break
@@ -72,7 +72,17 @@ def receive_thread(socket):
 #             print('Error sending:', str(e))
 #             break
 
-
+def recv_input(sock):
+  input_buffer = b''
+  while True:
+    
+    packet = sock.recv(1024)
+    input_buffer += packet
+    if packet.endswith(b'\n'):
+      break
+  if not input_buffer.endswith(b'\n'):
+    input_buffer += b'\n'
+  return input_buffer.decode('utf-8')
 
 def vayu_thread(socket,socket2):
     global started
@@ -157,3 +167,5 @@ vayu_thread.join()
 
 print('Client threads closed.')
 ClientSocket.close()
+
+
