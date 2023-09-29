@@ -46,11 +46,13 @@ while (len(d) != requests):
     if size > 0:
         try:
             sock.sendto(message.encode(), server_address)
-            data, server = sock.recvfrom(2096)
-            data = data.decode()
-            print('\n\n\n\n', data, '\n\n\n\n')
-            d[i] = data
-            arr[i][1] = 0
+            start_time = time.time()
+            while (time.time() - start_time < 5):
+                data, server = sock.recvfrom(2096)
+                data = data.decode()
+                print('\n\n\n\n', data, '\n\n\n\n')
+                d[i] = data
+                arr[i][1] = 0
         except:
             print('cant fetch data', offset, size)
         
