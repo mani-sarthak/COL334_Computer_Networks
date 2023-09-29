@@ -43,15 +43,11 @@ timeout = 0.01
 
 
 
-def removeHeaders(data):
-    pattern = r"Offset:\s+(\d+)\s+NumBytes:\s+(\d+)\s+(.*)"
-    match = re.search(pattern, data)
-
-    if match:
-        body = match.group(3)
-        return body+'\n'
-    else:
-        return "\n"
+def extract_data(input_text):
+    parts = input_text.split("\n\n", 1)
+    return parts[1]
+    
+    
 while (len(d) != requests):
     i = i % requests
     offset = arr[i][0]
@@ -68,15 +64,17 @@ while (len(d) != requests):
                 data, server = sock.recvfrom(2096)
                 data = data.decode()
                 # print('\n\n\n\n', data, '\n\n\n\n')
-                # print('fetched', offset, size)
-                d[i] = removeHeaders(data)
+                # print(data)
+                d[i] = extract_data(data)
+                # d[i] = data
+                print('fetched', offset, size, len(d))
                 arr[i][1] = 0
         except:
-            print()
+            print('cant receive')
         
         time.sleep(timeout)
         print(len(d), i)
-        i += 1
+    i += 1
     
 print(d)
 ans = ""
