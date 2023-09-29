@@ -1,7 +1,7 @@
 import socket
 import re
 import time
-
+import select
 server_address = ('127.0.0.1', 9802)  # Replace with your server's address and port
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -36,8 +36,10 @@ arr = [(x, min(x+maxSize, size)-x) for x in range(0, size, maxSize)]
 # print(arr)
 
 requests = len(arr)
+print('requests to send :', requests)
 d = dict()
 i = 0
+timeout = 3
 while (len(d) != requests):
     i = i % requests
     offset = arr[i][0]
@@ -47,17 +49,34 @@ while (len(d) != requests):
         try:
             sock.sendto(message.encode(), server_address)
             start_time = time.time()
-            while (time.time() - start_time < 5):
+            readable, _, _ = select.select([sock], [], [], timeout)
+            if not readable:
+                print('skipped', offset, size)
+            else:
                 data, server = sock.recvfrom(2096)
                 data = data.decode()
-                print('\n\n\n\n', data, '\n\n\n\n')
+                # print('\n\n\n\n', data, '\n\n\n\n')
+                # print('fetched', offset, size)
                 d[i] = data
                 arr[i][1] = 0
         except:
-            print('cant fetch data', offset, size)
+            print()
         
-    time.sleep(5)
-    print(len(d))
+    time.sleep(timeout)
+    print(len(d), i)
     i += 1
     
 print(d)
+ans = ""
+for i in range(requests):
+    ans += d[i]
+
+
+
+def writeToFile(data, file):
+    with open(file, 'w') as f:
+        f.write(data)
+    f.close()
+    return 
+
+writeToFile(ans, 'output.txt')
