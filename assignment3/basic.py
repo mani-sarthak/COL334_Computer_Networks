@@ -2,7 +2,7 @@ import socket
 import re
 import time
 import select
-server_address = ('127.0.0.1', 9802)  # Replace with your server's address and port
+server_address = ('127.0.0.1', 9803)  # Replace with your server's address and port
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
@@ -39,7 +39,19 @@ requests = len(arr)
 print('requests to send :', requests)
 d = dict()
 i = 0
-timeout = 3
+timeout = 0.01
+
+
+
+def removeHeaders(data):
+    pattern = r"Offset:\s+(\d+)\s+NumBytes:\s+(\d+)\s+(.*)"
+    match = re.search(pattern, data)
+
+    if match:
+        body = match.group(3)
+        return body+'\n'
+    else:
+        return "\n"
 while (len(d) != requests):
     i = i % requests
     offset = arr[i][0]
@@ -57,14 +69,14 @@ while (len(d) != requests):
                 data = data.decode()
                 # print('\n\n\n\n', data, '\n\n\n\n')
                 # print('fetched', offset, size)
-                d[i] = data
+                d[i] = removeHeaders(data)
                 arr[i][1] = 0
         except:
             print()
         
-    time.sleep(timeout)
-    print(len(d), i)
-    i += 1
+        time.sleep(timeout)
+        print(len(d), i)
+        i += 1
     
 print(d)
 ans = ""
