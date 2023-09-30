@@ -31,7 +31,7 @@ finally:
 
 
 offset = 0
-maxSize = 1400 ## 1448 could be max just to be on safer side
+maxSize = 40 ## 1448 could be max just to be on safer side
 arr = [(x, min(x+maxSize, size)-x) for x in range(0, size, maxSize)]
 # print(arr)
 
