@@ -18,10 +18,14 @@ def writeToFile(data, file):
         f.write(data)
     f.close()
 
+
+## maybe this might be inefficient since the text may contain two lines of break elsewhre
 def extract_data(input_text):
-    parts = input_text.split("\n\n", 1)
+    parts = input_text.split("\n\n", 1) # str[str.index('\n\n):]
     return parts[1]
 
+
+## returns offset
 def extract_data2(input_text):
     parts = input_text.split("\n\n", 1)
     byparts = parts[0].split("\n")
@@ -30,6 +34,8 @@ def extract_data2(input_text):
     print(match.group(1))
     return int(match.group(1))
 
+
+## returns size of the data received (in Bytes)
 def getSize(data):
     match = re.search(r'Size:\s+(\d+)', data)
     return int(match.group(1))
@@ -88,6 +94,8 @@ def main():
     reciever_thread = threading.Thread(target=recieving_thread,args=(requests,arr))
     sender_thread.start()
     reciever_thread.start()
+    ## how does the threads run one after another ??
+    ## like we asked for the sender_thread.join() but not in the reciever_thread
     sender_thread.join()
     print(data_dict)
     ans = ""
