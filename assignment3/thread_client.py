@@ -1,4 +1,5 @@
 import threading
+import hashlib
 import sys
 import socket
 import time
@@ -6,7 +7,7 @@ import sys
 import re
 import select
 
-server_address = ('127.0.0.1', 9801)  # Replace with your server's address and port
+server_address = ('127.0.0.1', 9801) 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 data_dict = dict()
 maxSize = 25
@@ -94,8 +95,16 @@ def main():
     for i in range(requests):
         ans += data_dict[i]
     writeToFile(ans, 'output_thread.txt')
+    md5_hash = hashlib.md5()
+    md5_hash.update(ans.encode('utf-8'))
+    md5_hex = md5_hash.hexdigest()
+    # print(md5_hex)
+    submit_command = f'Submit: cs1210552@bots\nMD5: {md5_hex}\n\n'
+    sock.sendto(submit_command.encode(), server_address)
+    data, server = sock.recvfrom(2096)
+    data = data.decode()
+    print(data)
     finish = time.time()
-    print(finish-start)
-    
+    print((finish-start)*1000)
 if __name__ == '__main__':
     main()
