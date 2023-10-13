@@ -2,7 +2,7 @@ import socket
 import re
 import time
 import select
-server_address = ('127.0.0.1', 9803)  # Replace with your server's address and port
+server_address = ('127.0.0.1', 9802)  # Replace with your server's address and port
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
@@ -31,7 +31,7 @@ finally:
 
 
 offset = 0
-maxSize = 40 ## 1448 could be max just to be on safer side
+maxSize = 1350 ## 1448 could be max just to be on safer side
 arr = [(x, min(x+maxSize, size)-x) for x in range(0, size, maxSize)]
 # print(arr)
 
@@ -47,6 +47,7 @@ def extract_data(input_text):
     parts = input_text.split("\n\n", 1)
     return parts[1]
     
+start = time.time()
     
 while (len(d) != requests):
     i = i % requests
@@ -76,7 +77,7 @@ while (len(d) != requests):
         print(len(d), i)
     i += 1
     
-print(d)
+# print(d)
 ans = ""
 for i in range(requests):
     ans += d[i]
@@ -90,3 +91,6 @@ def writeToFile(data, file):
     return 
 
 writeToFile(ans, 'output.txt')
+
+
+print(time.time()-start)

@@ -6,10 +6,10 @@ import sys
 import re
 import select
 
-server_address = ('127.0.0.1', 9801)  # Replace with your server's address and port
+server_address = ('127.0.0.1', 9802)  # Replace with your server's address and port
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 data_dict = dict()
-maxSize = 25
+maxSize = 1350
 offset = 0
 timeout = 0.01
 
@@ -96,6 +96,9 @@ def main():
     reciever_thread.start()
     ## how does the threads run one after another ??
     ## like we asked for the sender_thread.join() but not in the reciever_thread
+    
+    
+    ## why shouldn't it be receiver_thread.join() ?? since the main functiion is completed when receiver thread is completed
     sender_thread.join()
     print(data_dict)
     ans = ""

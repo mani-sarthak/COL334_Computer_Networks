@@ -23,3 +23,7 @@ Remember that packets can get reordered on the network, so you should not expect
 the same order in which you sent. Further, you should not expect to receive a reply to each request
 because the server may have decided to drop the request! Or the network may have dropped your
 request or reply packet. 
+
+
+How to run the server ??
+`java UDPServer 9801 testcase.txt.1 100 constantrate notournament verbose`
