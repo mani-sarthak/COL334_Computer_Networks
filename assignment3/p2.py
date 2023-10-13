@@ -102,7 +102,8 @@ def receive_file():
 
     # Send the received data to a file
     with open('received_file.txt', 'wb') as f:
-        f.write(buffer)
+        # Write only the part of the buffer that contains received data
+        f.write(buffer[:file_size])
 
     print("File received and saved.")
 

@@ -32,3 +32,7 @@ How to run the server ??
 
 Notes:
 1. TCP’s self-clocking idea itself and simply maintained a congestion window
+
+
+
+In thread_clinet in reiciving thread if we get strick we wait it out till we recive the ,ines so we never incur any penalty whatsoever whatevr the large data we have ti fetch. 
