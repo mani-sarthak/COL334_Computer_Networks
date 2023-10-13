@@ -81,7 +81,7 @@ def sending_thread(requests,arr):
 def main():
     start = time.time()
     try:
-        message = 'SendSize\n\n'  
+        message = 'SendSize\nReset\n\n'  
         sock.sendto(message.encode(), server_address)
         data, server = sock.recvfrom(2096)
         data = data.decode()
@@ -116,6 +116,6 @@ def main():
     data = data.decode()
     print(data)
     finish = time.time()
-    print((finish-start)*1000)
+    print((finish-start)*1000, "ms")
 if __name__ == '__main__':
     main()

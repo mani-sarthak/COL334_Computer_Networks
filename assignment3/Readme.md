@@ -27,3 +27,8 @@ request or reply packet.
 
 How to run the server ??
 `java UDPServer 9801 testcase.txt.1 100 constantrate notournament verbose`
+
+
+
+Notes:
+1. TCP’s self-clocking idea itself and simply maintained a congestion window
