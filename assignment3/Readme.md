@@ -36,3 +36,13 @@ Notes:
 
 
 In thread_clinet in reiciving thread if we get strick we wait it out till we recive the ,ines so we never incur any penalty whatsoever whatevr the large data we have ti fetch. 
+
+
+
+
+
+Notes: final reading 
+Hammad :-> squeeshed and constant rate and offset !!
+1. TCP-like protocol for reliable data transfer, with congestion control-like mechanisms to not overwhelm the network yet obtain high throughput.
+2. lossy network -> constant packet loss rate
+3. 
