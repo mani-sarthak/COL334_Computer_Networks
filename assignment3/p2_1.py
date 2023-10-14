@@ -1,6 +1,7 @@
 import socket
 import time
 import re
+import hashlib
 
 # Server address and port
 server_address = ('127.0.0.1', 9801)
@@ -9,7 +10,7 @@ def getSize():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # Send data to the server
-        message = 'SendSize\n\n'  # Your message here
+        message = 'SendSize\nReset\n\n'  # Your message here
         sock.sendto(message.encode(), server_address)
 
         # Receive a response from the server (optional)
@@ -29,12 +30,13 @@ def getSize():
 
 def receive_file():
     # Initialize variables
+    start = time.time()
     offset = 0
     packet_size = 1024  # Initial packet size
     file_size = getSize()  # Get the target file size
     cwnd = 1
     ssthresh = 16  # Set the threshold value
-    timeout = 1.0  # Initial timeout value
+    timeout = 0.015  # Initial timeout value
     max_retransmissions = 300
 
     # Create a UDP socket
@@ -104,8 +106,6 @@ def receive_file():
                         packet_size = 1024  # Reduce the packet size
                         timeout *= 2
 
-    # Close the UDP socket
-    client_socket.close()
 
     # Send the received data to a file
     ans = ""
@@ -114,10 +114,23 @@ def receive_file():
             f.write(received_data[offset].encode())
             ans += received_data[offset]
     
-    print(ans)
+    # print(ans)
+    md5_hash = hashlib.md5()
+    md5_hash.update(ans.encode())
+    md5_hex = md5_hash.hexdigest()
+    print(md5_hex)
+    submit_command = f'Submit: cs1210552@bots\nMD5: {md5_hex}\n\n'
+    client_socket.sendto(submit_command.encode(), server_address)
+    data, server = client_socket.recvfrom(2096)
+    data = data.decode()
+    print(data)
+    
+    client_socket.close()
     
 
     print("File received and saved.")
+    finish=time.time()
+    print(finish-start)
 
 if __name__ == "__main__":
     receive_file()
