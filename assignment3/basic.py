@@ -31,8 +31,8 @@ finally:
 
 
 offset = 0
-maxSize = 1350 ## 1448 could be max just to be on safer side
-arr = [(x, min(x+maxSize, size)-x) for x in range(0, size, maxSize)]
+packet_size = 1350 ## 1448 could be max just to be on safer side
+arr = [(x, min(x+packet_size, size)-x) for x in range(0, size, packet_size)]
 # print(arr)
 
 requests = len(arr)
