@@ -1,0 +1,46 @@
+
+Bytes: 892358
+Result: true
+Time: 6107
+Penalty: 1
+Lines: 10000
+
+
+
+Bytes: 196759
+Result: true
+Time: 1369
+Penalty: 0
+Lines: 1000
+
+
+
+
+Bytes: 12228
+Result: true
+Time: 107
+Penalty: 0
+Lines: 100
+
+
+
+
+Bytes: 4977992
+Result: true
+Time: 34002
+Penalty: 0
+Lines: 100000
+
+
+
+
+
+
+893900
+Result: true
+Time: 8563
+Penalty: 1
+
+
+
+

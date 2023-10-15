@@ -1,4 +1,5 @@
 import socket
+import hashlib
 import time
 import re
 # Server address and port
@@ -9,7 +10,7 @@ def getSize():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # Send data to the server
-        message = 'SendSize\n\n'  # Your message here
+        message = 'SendSize\nReset\n\n'  # Your message here
         sock.sendto(message.encode(), server_address)
 
         # Receive a response from the server (optional)
@@ -30,13 +31,14 @@ def getSize():
 
 def receive_file():
     # Initialize variables
+    start=time.time()
     offset = 0
-    packet_size = 1024  # Initial packet size
+    packet_size = 1448  # Initial packet size
     file_size = getSize()  # Get the target file size
     cwnd = 1
     ssthresh = 16  # Set the threshold value
-    timeout = 0.01  # Initial timeout value
-    max_retransmissions = 300
+    timeout = 0.016 # Initial timeout value
+    max_retransmissions = 40
 
     # Create a UDP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,6 +53,8 @@ def receive_file():
         # Send a request to the server with the current offset and packet size
         request = f"Offset: {offset}\nNumBytes: {packet_size}\n\n"
         client_socket.sendto(request.encode(), server_address)
+        print(request)
+        print('message sent')
 
         # Start the timer
         start_time = time.time()
@@ -58,7 +62,7 @@ def receive_file():
 
         while True:
             try:
-                data, addr = client_socket.recvfrom(packet_size)
+                data, addr = client_socket.recvfrom(packet_size+1000)
 
                 # Extract and remove the header from the received data
                 header, data = data.split(b'\n\n', 1)
@@ -69,6 +73,9 @@ def receive_file():
                 buffer[offset - len(data):offset] = data
 
                 # Check if the entire file is fetched
+                # print(len(buffer))
+                print('fetched', offset)
+                print('data recieved')
                 if offset >= file_size:
                     break
 
@@ -94,18 +101,30 @@ def receive_file():
                 # Timeout occurred, double timeout
                 cwnd = 1
                 ssthresh = max(cwnd // 2, 1)
-                packet_size = 1024  # Reduce the packet size
+                # packet_size = 1448  # Reduce the packet size
                 timeout *= 2
 
     # Close the UDP socket
-    client_socket.close()
 
     # Send the received data to a file
     with open('received_file.txt', 'wb') as f:
-        # Write only the part of the buffer that contains received data
         f.write(buffer[:file_size])
+    md5_hash = hashlib.md5()
+    md5_hash.update(buffer[:file_size])
+    md5_hex = md5_hash.hexdigest()
+    print(md5_hex)
+    submit_command = f'Submit: cs1210552@bots\nMD5: {md5_hex}\n\n'
+    client_socket.sendto(submit_command.encode(), server_address)
+    data, server = client_socket.recvfrom(2096)
+    data = data.decode()
+    print(data)
+    
+    client_socket.close()
+    
 
     print("File received and saved.")
+    finish=time.time()
+    print(finish-start)
 
     
 if __name__ == "__main__":
