@@ -9,10 +9,10 @@ server_address = ('127.0.0.1', 9801)
 
 # Constants
 PACKET_SIZE = 1400
-SSTHRESHOLD = 16
-TIMEOUT = 0.01
+SSTHRESHOLD = 10
+TIMEOUT = 0.02
 FACTOR = 0.8
-NUM_THREADS = 10  # Adjust the number of parallel threads as needed
+NUM_THREADS = 4  # Adjust the number of parallel threads as needed
 MAX_RETRIES = 3  # Max number of retries for timeout
 
 def getSize():
@@ -25,14 +25,10 @@ def getSize():
         # Receive a response from the server (optional)
         data, server = sock.recvfrom(2096)
         data = data.decode()
-        # print(data)
         size = int(re.search(r'Size:\s+(\d+)', data).group(1))
-        print(size)
-        # print(server)
-
+        print(f"File size: {size}")
     finally:
         # Clean up the socket
-        print('Done')
         sock.close()
     return size
 
@@ -45,7 +41,8 @@ def send_request(offset, size, client_socket):
             data, _ = client_socket.recvfrom(PACKET_SIZE + 1000)
             return offset, size, data
         except socket.timeout:
-            print(f"Timeout for Offset {offset}, Retrying...")
+            if retries == 0:  # Only print on the first retry
+                print(f"Timeout for Offset {offset}, Retrying...")
             retries += 1
     return offset, size, None
 

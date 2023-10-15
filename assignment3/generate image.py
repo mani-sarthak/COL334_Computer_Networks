@@ -6,36 +6,37 @@ import time
 import sys
 import re
 import select
+import matplotlib.pyplot as plt
 
+start = time.time()
 server_address = ('127.0.0.1', 9801) 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 data_dict = dict()
-maxSize = 1350
+maxSize = 1448
 offset = 0
-timeout = 0.01 ## change it accordingly
+timeout = 0.01
+plot1=[]
+plot2=[]
+misses = []
+miss = 0
 
 def writeToFile(data, file):
     with open(file, 'w') as f:
         f.write(data)
     f.close()
 
-
 def extract_data(input_text):
-    parts = input_text.split("\n\n", 1) # str[str.index('\n\n):]
+    parts = input_text.split("\n\n", 1)
     return parts[1]
 
-
-## returns offset
 def extract_data2(input_text):
     parts = input_text.split("\n\n", 1)
     byparts = parts[0].split("\n")
     pattern = r"Offset:\s+(\d+)"
     match = re.search(pattern, byparts[0])
-    print(match.group(1))
+    # print(match.group(1))
     return int(match.group(1))
 
-
-## returns size of the data received (in Bytes)
 def getSize(data):
     match = re.search(r'Size:\s+(\d+)', data)
     return int(match.group(1))
@@ -49,13 +50,19 @@ def recieving_thread(requests,arr):
             data_extract = extract_data(data)
             offset_value = extract_data2(data)
             data_dict[offset_value//maxSize] = data_extract
-            # print(len(data_dict))
-            # print('fetched', offset)
-            # print('data recieved')
+            subtime=time.time()
+            plot1.append([offset_value,(subtime-start)*1000])
+            print(len(data_dict))
+            print('fetched', offset)
+            print('data recieved')
             arr[offset_value//maxSize][1]=0
+            # misses.append([len(data_dict),(-start)*1000])
         else:
+            # misses.append([miss,(subtime-start)*1000])
+            miss += 1
             continue
         time.sleep(timeout)
+    # return misses 
 
 def sending_thread(requests,arr):
     global offset
@@ -69,6 +76,8 @@ def sending_thread(requests,arr):
             try:
                 print(message)
                 sock.sendto(message.encode(), server_address)
+                subtime1=time.time()
+                plot2.append([offset,(subtime1-start)*1000])
                 time.sleep(timeout)
                 # time.sleep(2)
                 print('message sent')
@@ -76,9 +85,9 @@ def sending_thread(requests,arr):
                 continue
         i+=1
         # print(len(data_dict))
+        misses.append([len(data_dict),(time.time()-start)*1000])
 
 def main():
-    start = time.time()
     try:
         message = 'SendSize\nReset\n\n'  
         sock.sendto(message.encode(), server_address)
@@ -110,6 +119,43 @@ def main():
     data = data.decode()
     print(data)
     finish = time.time()
-    print((finish-start)*1000, "ms")
+    print((finish-start))
+    # x1=[]
+    # y1=[]
+    # i=0
+    # while plot1[i][1]<500:
+    #     x1.append(plot1[i][1])
+    #     y1.append(plot1[i][0])
+    #     i+=1
+    # x2=[]
+    # y2=[]
+    # i=0
+    # while plot2[i][1]<500:
+    #     x2.append(plot2[i][1])
+    #     y2.append(plot2[i][0])
+    #     i+=1
+    x2 = [plot2[i][1] for i in range(len(plot2))][-20:]
+    y2 = [plot2[i][0] for i in range(len(plot2))][-20:]
+    x1 = [plot1[i][1] for i in range(len(plot1))][-20:]
+    y1 = [plot1[i][0] for i in range(len(plot1))][-20:]
+    # x1 = [misses[i][1] for i in range(len(misses))][:30]
+    # y1 = [misses[i][0] for i in range(len(misses))][:30]
+    # print(len(misses))
+    # with open ('x1.txt','w') as f:
+    #     f.write(str(x1) + '\n')
+    #     f.write(str(y1) + '\n')
+    #     f.write(str(x2) + '\n')
+    #     f.write(str(y2) + '\n')
+    # f.close()        
+    fig,ax = plt.subplots()
+    ax.plot(x2,y2,label = 'sending Data',marker = 'o',linestyle = '-',color = 'blue')
+    ax.plot(x1,y1,label = 'recieving Data',marker = 'o',linestyle = 'None', color = 'orange')
+    # ax.set_yticks(range(0, 45000, 5000))
+    # ax.set_xticks(range(0, 500, 100))
+    ax.set_xlabel('Time in (ms)')
+    ax.set_ylabel('Offest in (bytes)')
+    ax.set_title('Sequence Number Trace')
+    ax.legend()
+    fig.savefig('zoom_last.png')
 if __name__ == '__main__':
     main()
