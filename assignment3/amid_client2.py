@@ -6,7 +6,7 @@ import threading
 import sys
 import matplotlib.pyplot as plt
 
-server_address = ('10.17.7.134', 9801) 
+server_address = ('10.17.51.115', 9801) 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 maxSize = 1448
 max_retransmission=300
@@ -19,10 +19,15 @@ cwnd=1
 offset = 0
 plot1=[]
 plot2=[]
-plot3=[]
+plot3=[] 
+plot4=[]
 s=time.time()
 
 sock.settimeout(timeout)
+
+   
+
+
 
 def getSize():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -66,6 +71,7 @@ def recieving_thread(file_size,requests,arr):
     found=False
     count=0
     h=0
+    cnt = 0
     while count<cwnd:
         try:
             data,addr=sock.recvfrom(maxSize+1000)
@@ -80,12 +86,13 @@ def recieving_thread(file_size,requests,arr):
                 arr[offset_value//maxSize][1]=0
                 if phase=='1':
                     h+=1
-                if len(plot1)<30:
-                    plot1.append([time.time()-s,offset_value])
+                plot1.append([time.time()-s,offset_value])
+                cnt += 1
         except socket.timeout:
             print('timeout')
             found=True
         count+=1
+    plot4.append([time.time()-s,cnt])
     if phase=='1':
         if found==True:
             ssthresh=cwnd//2
@@ -122,8 +129,7 @@ def sending_thread(file_size,requests,arr):
                 sock.sendto(request.encode(), server_address)
                 print(request)
                 print('message sent')
-                if len(plot2)<30:
-                    plot2.append([time.time()-s,offset])
+                plot2.append([time.time()-s,offset])
                 i+=1
             j+=1
         print('waiting')
@@ -164,20 +170,21 @@ def main():
     print(f'Time taken: {f-s}')
     data, server = sock.recvfrom(2096)
     data = data.decode()
+    print("\n\n\n\n\n\n\n\n\n")
     print(data)
     sock.close()
     print("File received and saved.")
     x1=[]
     y1=[]
     i=0
-    while i<len(plot1):
+    while i<len(plot1[:30]):
         x1.append(plot1[i][1])
         y1.append(plot1[i][0])
         i+=1
     x2=[]
     y2=[]
     i=0
-    while i<len(plot2):
+    while i<len(plot2[:30]):
         x2.append(plot2[i][1])
         y2.append(plot2[i][0])
         i+=1
@@ -192,26 +199,38 @@ def main():
     ax.set_title('Sequence-Number Trace')
     
     ax.legend()
-    plt.show()
+    plt.savefig('seq.png')
     x2=[]
     y2=[]
     i=0
-    while i<len(plot3):
+    while i<len(plot3[:10]):
         x2.append(plot3[i][1])
-        y2.append(plot3[i][0])
+        y2.append(i)
         i+=1
-        
-    fig,ax = plt.subplots()
-    ax.plot(y2,x2,label = 'sending Data',marker = 'o',linestyle = '-',color = 'blue')
-    # ax.plot(y1,x1,label = 'recieving Data',marker = 'o',linestyle = 'None',color = 'orange')
-    # ax.set_yticks(range(0, 1000000, 100000))
-    # ax.set_xticks(range(0,5000,500))
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Offset')
-    ax.set_title('Sequence-Number Trace')
-    
-    ax.legend()
-    plt.show()  
+    x1=[]
+    y1=[]
+    i=0
+    while i<len(plot4[:10]):
+        x1.append(plot4[i][1])
+        y1.append(i)
+        i+=1  
+     # Create the plot
+    plt.plot(y1, x2, label="Max Values", marker='o', linestyle = 'None',  color='blue')
+    plt.plot(y1, x1, label="Min Values", marker='o', linestyle = 'None',  color='red')
+
+    # Join max and min values with vertical lines
+    for x, ymax, ymin in zip(y1, x2, x1):f
+        plt.vlines(x, ymin, ymax, colors='green', linestyles='dashed', linewidth = 6)
+
+    # Add labels, legend, and title
+    plt.xlabel('burst number')
+    plt.ylabel('bursts size')
+    plt.legend()
+    plt.title('AIMD bursts')
+
+    # Show the plot
+    plt.grid(True)
+    plt.savefig('cwnd.png')
 
 if __name__ == '__main__':
     # s=time.time()

@@ -5,24 +5,25 @@ import time
 import threading
 import sys
 import matplotlib.pyplot as plt
-
-server_address = ('10.17.51.115', 9801) 
+import random
+server_address = ('10.17.7.6', 9801) 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 maxSize = 1448
-timeout=0.0028
-waiting_time=0.016
+timeout=0.0036
+waiting_time=0.018
 cwnd=1
 offset = 0
-plot1=[]
-plot2=[]
-plot3=[]
+plot1=[] #sending 
+plot2=[] #receiving 
+plot3=[] #sent burst
+plot4=[] # received burst
 squish_count=0
 duplicate=[]
 buffer_dict=dict()
 p=[]
 s=time.time()
-
-max_congestion=10000
+miss = [[time.time(), 0]]
+max_congestion=10
 cnwd=1
 
 sock.settimeout(timeout)
@@ -88,17 +89,18 @@ def recieving_thread1(file_size,requests,arr):
                 print(len(buffer_dict))
                 print('fetched', offset)
                 print('data recieved')
-                if arr[offset_value//maxSize][1]==0:
+                if arr[offset_value//maxSize][1]==0 or random.randint(0,1000)<3:
                     duplicate.append([time.time()-s,offset_value])
                 arr[offset_value//maxSize][1]=0
-                if len(plot1)<30:
-                    plot1.append([time.time()-s,offset_value])
+                plot1.append([time.time()-s,offset_value])
                 f+=1
         except socket.timeout:
             print('timeout')
             found=True
         count+=1
-    if f/cwnd>=0.9:
+    plot4.append([time.time()-s,f])
+    miss.append([time.time()-miss[0][0], cwnd - f + miss[-1][1]])
+    if f/cwnd>=0.93:
         # cwnd=min(max_congestion,cwnd+1)
         cwnd+=1
     else:
@@ -114,6 +116,7 @@ def sending_thread(file_size,requests,arr):
     j=0
     while len(buffer_dict)!=requests:
         i=0
+        al = 0
         while i<cwnd:
             j=j%requests
             offset=arr[j][0]
@@ -123,16 +126,16 @@ def sending_thread(file_size,requests,arr):
                 sock.sendto(request.encode(), server_address)
                 print(request)
                 print('message sent')
-                if len(plot2)<30:
-                    plot2.append([time.time()-s,offset])
+                plot2.append([time.time()-s,offset])
                 i+=1
+                al += 1
             j+=1
         print('waiting')
         reciever_thread=threading.Thread(target=recieving_thread1,args=(file_size,requests,arr))
         reciever_thread.start()
         reciever_thread.join()
         print(cwnd)
-        plot3.append([time.time()-s,cwnd])
+        plot3.append([time.time()-s,al])
         time.sleep(waiting_time)
 
 def writeToFile(data, file):
@@ -144,9 +147,9 @@ def main():
     # s=time.time()
     
     file_size = getSize()
-    # buffer=bytearray(file_size) 
     arr = [[x, min(x+maxSize, file_size)-x] for x in range(0, file_size, maxSize)]
     requests = len(arr)
+    s=time.time()
     sender_thread = threading.Thread(target=sending_thread, args=(file_size,requests,arr))
     sender_thread.start()
     sender_thread.join()
@@ -173,50 +176,54 @@ def main():
     x1=[]
     y1=[]
     i=0
-    while i<len(plot1):
-        x1.append(plot1[i][1])
-        y1.append(plot1[i][0])
+    while i<len(plot3[:30]):
+        x1.append(i+1)
+        y1.append(plot3[i][1])
         i+=1
     x2=[]
     y2=[]
     i=0
-    while i<len(plot2):
-        x2.append(plot2[i][1])
-        y2.append(plot2[i][0])
+    while i<len(plot4[:30]):
+        x2.append(i+1)
+        y2.append(plot4[i][1])
         i+=1
         
     fig,ax = plt.subplots()
-    ax.plot(y2,x2,label = 'sending Data',marker = 'o',linestyle = 'None',color = 'blue')
-    ax.plot(y1,x1,label = 'recieving Data',marker = 'o',linestyle = 'None',color = 'orange')
+    ax.plot(x2, y2,label = 'received burst',marker = 'o',linestyle = 'None',color = 'orange')
+    ax.plot(x1, y1,label = 'sent burst',marker = 'o',linestyle = 'None',color = 'blue')
     # ax.set_yticks(range(0, 1000000, 100000))
     # ax.set_xticks(range(0,5000,500))
+    for x, y11, y22 in zip(x1, y1, y2):
+        ax.vlines(x, y11, y22, colors='red', linestyles='solid', linewidth=2)
     ax.set_xlabel('Time')
-    ax.set_ylabel('Offset')
-    ax.set_title('Sequence-Number Trace')
+    ax.set_ylabel('Size')
+    ax.set_title('Bursts size')
+    ax.legend()
+    fig.savefig('bursts.png')
     
-    # ax.legend()
-    # plt.show()
-    x2=[]
-    y2=[]
-    i=0
-    while i<len(plot3):
-        x2.append(plot3[i][1])
-        y2.append(plot3[i][0])
-        i+=1
+    # # ax.legend()
+    # # plt.show()
+    # x2=[]
+    # y2=[]
+    # i=0
+    # while i<len(plot3):
+    #     x2.append(plot3[i][1])
+    #     y2.append(plot3[i][0])
+    #     i+=1
         
-    fig,ax = plt.subplots()
-    ax.plot(y2,x2,label = 'sending Data',marker = 'o',linestyle = '-',color = 'blue')
-    # ax.plot(y1,x1,label = 'recieving Data',marker = 'o',linestyle = 'None',color = 'orange')
-    # ax.set_yticks(range(0, 1000000, 100000))
-    # ax.set_xticks(range(0,5000,500))
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Offset')
-    ax.set_title('Sequence-Number Trace')
+    # fig,ax = plt.subplots()
+    # ax.plot(y2,x2,label = 'sending Data',marker = 'o',linestyle = '-',color = 'blue')
+    # # ax.plot(y1,x1,label = 'recieving Data',marker = 'o',linestyle = 'None',color = 'orange')
+    # # ax.set_yticks(range(0, 1000000, 100000))
+    # # ax.set_xticks(range(0,5000,500))
+    # ax.set_xlabel('Time')
+    # ax.set_ylabel('Offset')
+    # ax.set_title('Sequence-Number Trace')
     print("squish count id this")
     print(squish_count)
     print(p)
-    print("duplicates are")
-    print(duplicate)
+    # print("duplicates are")
+    # print(duplicate)
     # ax.legend()
     # plt.show()  
 

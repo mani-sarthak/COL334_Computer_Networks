@@ -7,12 +7,12 @@ import sys
 import re
 import select
 
-server_address = ('127.0.0.1', 9801) 
+server_address = ('10.17.7.134', 9801) 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 data_dict = dict()
-maxSize = 1350
+maxSize = 1448
 offset = 0
-timeout = 0.01 ## change it accordingly
+timeout = 0.03## change it accordingly
 
 def writeToFile(data, file):
     with open(file, 'w') as f:
